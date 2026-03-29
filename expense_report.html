@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>かわいい経費報告 DX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff85a2;
+            --secondary: #fbb6ce;
+            --accent: #b794f4;
+            --bg: #fff5f7;
+        }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#fbb6ce 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .kawaii-font { font-family: 'Kiwi Maru', serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 2px solid #ffffff;
+        }
+        .cute-shadow {
+            box-shadow: 0 10px 25px -5px rgba(255, 133, 162, 0.2);
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Header & Mascot Area -->
+    <div class="relative overflow-hidden pt-8 pb-4 px-4">
+        <div class="max-w-md mx-auto text-center">
+            <div id="mascotContainer" class="w-32 h-32 mx-auto mb-4 relative">
+                <div id="mascotLoader" class="absolute inset-0 flex items-center justify-center bg-pink-100 rounded-full animate-pulse">
+                    <span class="text-pink-400 text-xs font-bold">生成中...</span>
+                </div>
+                <img id="mascotImg" class="w-full h-full object-cover rounded-full cute-shadow floating hidden" alt="MHI DX Mascot">
+            </div>
+            <h1 class="kawaii-font text-2xl font-bold text-pink-600">おつかれさま、中西さん！</h1>
+            <p class="text-xs text-pink-400 font-medium">今日もDXで「止まらない運用」を💖</p>
+        </div>
+    </div>
+
+    <div class="max-w-md mx-auto px-4 space-y-4">
+        <!-- Main Card -->
+        <div class="glass-card rounded-3xl p-6 cute-shadow">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="kawaii-font font-bold text-slate-700">経費の報告</h2>
+                <button onclick="toggleSettings()" class="text-slate-400 hover:text-pink-400 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg>
+                </button>
+            </div>
+
+            <!-- Settings (Hidden) -->
+            <div id="settingsPanel" class="hidden mb-6 p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                <label class="text-[10px] font-bold text-slate-400 uppercase">GAS Endpoint URL</label>
+                <input type="text" id="gasUrl" class="w-full bg-white border-2 border-slate-200 rounded-xl p-2 mt-1 text-xs outline-none focus:border-pink-300">
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/50 p-3 rounded-2xl">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase">報告者</label>
+                        <input type="text" id="reporterName" value="中西 芯綾" class="w-full bg-transparent font-bold text-slate-700 outline-none">
+                    </div>
+                    <div class="bg-white/50 p-3 rounded-2xl">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase">報告日</label>
+                        <input type="date" id="currentDate" class="w-full bg-transparent font-bold text-slate-700 outline-none">
+                    </div>
+                </div>
+
+                <!-- Summary Row -->
+                <div class="bg-gradient-to-r from-pink-400 to-purple-400 p-4 rounded-3xl text-white shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold opacity-90 kawaii-font">合計金額</span>
+                        <span class="text-2xl font-black">¥ <span id="totalAmount">0</span></span>
+                    </div>
+                </div>
+
+                <!-- Items Container -->
+                <div id="expenseBody" class="space-y-3 pt-2">
+                    <!-- Dynamic Rows Go Here -->
+                </div>
+
+                <button onclick="addRow()" class="w-full py-3 border-2 border-dashed border-pink-200 rounded-2xl text-pink-400 font-bold text-sm hover:bg-pink-50 transition">
+                    + 明細を追加する
+                </button>
+            </div>
+        </div>
+
+        <!-- Note Card -->
+        <div class="glass-card rounded-3xl p-6 cute-shadow">
+            <h3 class="kawaii-font font-bold text-slate-700 mb-3">ひとことメモ (RACI)</h3>
+            <textarea id="notes" class="w-full h-24 bg-white/50 border-2 border-slate-100 rounded-2xl p-3 text-sm text-slate-600 outline-none focus:border-pink-200" placeholder="異常検知の一次切り分け対応など..."></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="btnSubmit" onclick="submitToSheets()" class="w-full bg-pink-500 hover:bg-pink-600 text-white py-4 rounded-3xl font-black text-lg shadow-xl shadow-pink-200 transition-all active:scale-95 flex items-center justify-center">
+            <span id="submitText">スプレッドシートへおくる 💌</span>
+        </button>
+
+        <div id="statusMessage" class="hidden p-4 rounded-2xl text-center text-sm font-bold animate-bounce"></div>
+    </div>
+
+    <!-- Navigation Bar (Mobile Friendly) -->
+    <div class="fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-md border-t border-pink-100 px-6 py-3 flex justify-around items-center no-print">
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-pink-400 flex flex-col items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            <span class="text-[8px] font-bold mt-1">ホーム</span>
+        </button>
+        <button onclick="window.print()" class="text-slate-400 flex flex-col items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 012-2H5a2 2 0 012 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            <span class="text-[8px] font-bold mt-1">PDF/印刷</span>
+        </button>
+    </div>
+
+    <script>
+        const apiKey = ""; // Runtime automatically provides this
+        const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwxa7hIUzhryNwFiPmyziJe5Zyz5tIZBdMzojDcx_5cp6Hbw-EXo-rJ-I5-AoKqV_qA/exec";
+
+        document.getElementById('currentDate').valueAsDate = new Date();
+        const gasUrlInput = document.getElementById('gasUrl');
+        gasUrlInput.value = localStorage.getItem('expense_gas_url') || DEFAULT_GAS_URL;
+
+        // Image Generation for Mascot
+        async function generateMascot() {
+            const prompt = "A super cute, round, pastel-colored mascot character representing DX and efficiency, wearing a small hard hat with a heart, clean flat design, white background, high quality illustration";
+            const mascotImg = document.getElementById('mascotImg');
+            const loader = document.getElementById('mascotLoader');
+
+            let retries = 0;
+            const maxRetries = 5;
+
+            async function attempt() {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('Generation failed');
+                    
+                    const result = await response.json();
+                    const base64Data = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                    
+                    if (base64Data) {
+                        mascotImg.src = `data:image/png;base64,${base64Data}`;
+                        mascotImg.classList.remove('hidden');
+                        loader.classList.add('hidden');
+                    }
+                } catch (error) {
+                    if (retries < maxRetries) {
+                        retries++;
+                        setTimeout(attempt, Math.pow(2, retries) * 1000);
+                    } else {
+                        loader.innerHTML = "<span class='text-[8px]'>🎨</span>";
+                    }
+                }
+            }
+            attempt();
+        }
+
+        function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('hidden');
+        }
+
+        function addRow() {
+            const container = document.getElementById('expenseBody');
+            const id = Date.now();
+            const div = document.createElement('div');
+            div.className = "bg-white p-4 rounded-2xl border border-pink-50 space-y-3 relative transition-all animate-fade-in";
+            div.innerHTML = `
+                <button onclick="this.parentElement.remove(); calculateTotal()" class="absolute top-2 right-2 text-slate-300 hover:text-pink-400">&times;</button>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="date" class="row-date text-xs border-none bg-pink-50/50 rounded-lg p-2 outline-none font-bold text-slate-600">
+                    <select class="row-category text-xs border-none bg-pink-50/50 rounded-lg p-2 outline-none font-bold text-slate-600">
+                        <option>交通費</option>
+                        <option>宿泊費</option>
+                        <option>消耗品</option>
+                        <option>会議費</option>
+                    </select>
+                </div>
+                <input type="text" class="row-desc w-full text-sm border-b border-pink-100 py-1 outline-none focus:border-pink-300 bg-transparent" placeholder="なにに使った？">
+                <div class="flex items-center justify-end">
+                    <span class="text-xs font-bold text-pink-300 mr-2">¥</span>
+                    <input type="number" onchange="calculateTotal()" class="amountInput text-right font-black text-slate-700 outline-none w-24" value="0">
+                </div>
+            `;
+            container.appendChild(div);
+            div.querySelector('.row-date').valueAsDate = new Date();
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('.amountInput').forEach(input => {
+                total += parseInt(input.value) || 0;
+            });
+            document.getElementById('totalAmount').innerText = total.toLocaleString();
+        }
+
+        function showStatus(msg, type = "success") {
+            const el = document.getElementById('statusMessage');
+            el.innerHTML = msg;
+            el.className = `mt-4 p-4 rounded-2xl text-center text-sm font-bold ${type === 'success' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 6000);
+        }
+
+        async function submitToSheets() {
+            const url = gasUrlInput.value.trim();
+            localStorage.setItem('expense_gas_url', url);
+
+            const items = [];
+            document.querySelectorAll('#expenseBody > div').forEach(div => {
+                const amount = parseInt(div.querySelector('.amountInput').value) || 0;
+                if (amount > 0) {
+                    items.push({
+                        date: div.querySelector('.row-date').value,
+                        category: div.querySelector('.row-category').value,
+                        desc: div.querySelector('.row-desc').value,
+                        amount: amount
+                    });
+                }
+            });
+
+            if (items.length === 0) {
+                showStatus("入力してね！💖", "error");
+                return;
+            }
+
+            const payload = {
+                reporter: document.getElementById('reporterName').value,
+                dept: "DX推進グループ",
+                reportDate: document.getElementById('currentDate').value,
+                notes: document.getElementById('notes').value,
+                total: document.getElementById('totalAmount').innerText,
+                items: items
+            };
+
+            const btn = document.getElementById('btnSubmit');
+            const txt = document.getElementById('submitText');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            txt.innerHTML = "<span class='loading-dots'>送信中</span>";
+
+            try {
+                await fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                showStatus("スプレッドシートにとどいたよ！✨", "success");
+            } catch (error) {
+                showStatus("エラーだよ... 😢", "error");
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                txt.innerText = "スプレッドシートへおくる 💌";
+            }
+        }
+
+        window.onload = () => {
+            addRow();
+            generateMascot();
+        };
+    </script>
+</body>
+</html>
