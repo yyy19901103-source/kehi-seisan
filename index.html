@@ -329,13 +329,13 @@
                     <div class="見出し"><div class="アイコン枠" id="icon-daily">📅</div> しゅうごとの よさん</div>
                     <div class="space-y-6 bg-white/30 p-5 rounded-[28px] border border-white/50 shadow-inner">
                         <div class="p-6 bg-white/70 border border-white rounded-[24px] shadow-sm">
-                            <span class="text-[11px] font-bold text-blue-400 block mb-4 text-center tracking-widest uppercase bg-blue-50/50 py-1 rounded-full w-max mx-auto px-4 border border-blue-100">やりくり費 (1〜4週目・予備)</span>
-                            <div class="grid grid-cols-3 gap-4">
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[9px] block text-center text-gray-500 font-bold mb-1">1週目</span><input type="number" name="day1W" class="入力らん text-center p-3 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[9px] block text-center text-gray-500 font-bold mb-1">2週目</span><input type="number" name="day2W" class="入力らん text-center p-3 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[9px] block text-center text-gray-500 font-bold mb-1">3週目</span><input type="number" name="day3W" class="入力らん text-center p-3 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[9px] block text-center text-gray-500 font-bold mb-1">4週目</span><input type="number" name="day4W" class="入力らん text-center p-3 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="col-span-2 relative focus-within:z-10"><span class="ラベル移動 text-[9px] block text-center text-gray-500 font-bold mb-1">予備のお金</span><input type="number" name="dayReserve" class="入力らん text-center p-3 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
+                            <span class="text-xs font-bold text-blue-500 block mb-4 text-center tracking-widest bg-blue-50/50 py-1.5 rounded-full w-max mx-auto px-5 border border-blue-100">やりくり費 (1〜4週目・予備)</span>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">1週目</span><input type="number" name="day1W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
+                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">2週目</span><input type="number" name="day2W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
+                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">3週目</span><input type="number" name="day3W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
+                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">4週目</span><input type="number" name="day4W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
+                                <label class="col-span-2 relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">予備のお金</span><input type="number" name="dayReserve" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
                             </div>
                         </div>
 
@@ -569,10 +569,14 @@
             const 収入 = 数値('prevCarry') + 数値('incomeS') + 数値('incomeA') + 数値('incomeSolar') + 数値('incomeOther');
             const 生活費内 = 数値('day1W') + 数値('day2W') + 数値('day3W') + 数値('day4W') + 数値('dayReserve');
             const 固定費 = 数値('fixIns1') + 数値('fixIns2') + 数値('fixComm') + 数値('fixInvest') + 数値('fixMed') + 数値('fixUtil');
-            const その他 = 数値('dayTrans') + 数値('daySpecial') + 数値('dayComm') + 数値('dayPocketS') + 数値('dayPocketA') + 数値('savings');
+            
+            // ★ 修正点: 支出の合計に「貯金 (savings)」を含めない
+            const その他 = 数値('dayTrans') + 数値('daySpecial') + 数値('dayComm') + 数値('dayPocketS') + 数値('dayPocketA');
             
             const 支出 = 固定費 + 生活費内 + その他;
-            const 繰越 = 収入 - 支出;
+            
+            // ★ 修正点: 収入から支出を引き、さらに「貯金」を引いた残りが純粋な「繰越」になる
+            const 繰越 = 収入 - 支出 - 数値('savings');
 
             document.getElementById('表示-収入').textContent = 収入.toLocaleString() + "円";
             document.getElementById('表示-支出').textContent = 支出.toLocaleString() + "円";
