@@ -80,7 +80,6 @@
 </head>
 <body class="pb-24">
 
-    <!-- 1. メインメニュー画面 -->
     <div id="screen-menu" class="p-6 max-w-md mx-auto fade-in">
         <div class="py-12 text-center">
             <div class="text-6xl mb-4 animate-bounce">🏠💕</div>
@@ -113,7 +112,6 @@
         </div>
     </div>
 
-    <!-- 2. 入力画面 -->
     <div id="screen-input" class="hidden p-4 max-w-md mx-auto fade-in">
         <div class="flex justify-between items-center mb-6">
             <h2 class="kawaii-font text-xl font-bold text-pink-500">家計簿をつける</h2>
@@ -126,7 +124,6 @@
         </div>
 
         <div class="space-y-6">
-            <!-- しゅうにゅう -->
             <div class="app-card p-5">
                 <div class="flex items-center gap-2 mb-4">
                     <span class="bg-pink-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">しゅうにゅう</span>
@@ -157,7 +154,6 @@
                 </div>
             </div>
 
-            <!-- 固定費 -->
             <div class="app-card p-5">
                 <div class="flex items-center gap-2 mb-4">
                     <span class="bg-blue-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">決まったしはらい</span>
@@ -203,7 +199,6 @@
                 </div>
             </div>
 
-            <!-- せいかつひ -->
             <div class="app-card p-5">
                 <div class="flex items-center gap-2 mb-4">
                     <span class="bg-emerald-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">せいかつひ</span>
@@ -222,15 +217,15 @@
                         <input type="number" id="daySpecial" onchange="calc()" value="30000" inputmode="numeric" class="w-32">
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-xs">通信</span>
+                        <span class="text-xs font-bold text-slate-500">通信</span>
                         <input type="number" id="dayComm" onchange="calc()" value="18000" inputmode="numeric" class="w-32">
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-xs">おこづかい</span>
+                        <span class="text-xs font-bold text-slate-500">おこづかい</span>
                         <input type="number" id="dayPocket" onchange="calc()" value="30000" inputmode="numeric" class="w-32">
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-xs">予備費</span>
+                        <span class="text-xs font-bold text-slate-500">予備費</span>
                         <input type="number" id="dayOther" onchange="calc()" value="30000" inputmode="numeric" class="w-32">
                     </div>
                     <div class="flex justify-between items-center border-t border-slate-100 pt-3">
@@ -240,7 +235,6 @@
                 </div>
             </div>
 
-            <!-- 週予算 -->
             <div class="app-card p-5">
                 <div class="flex items-center gap-2 mb-4">
                     <span class="bg-purple-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">しゅうよさん</span>
@@ -269,7 +263,6 @@
                 </div>
             </div>
 
-            <!-- まとめ -->
             <div class="app-card p-6 bg-gradient-to-br from-pink-500 to-rose-400 text-white shadow-lg">
                 <div class="space-y-3">
                     <div class="flex justify-between items-center opacity-80 text-xs">
@@ -290,19 +283,16 @@
             <button id="btnSubmit" onclick="submitToSheets()" class="w-full py-5 bg-pink-500 text-white rounded-3xl font-black text-xl shadow-lg active:scale-95 transition-all">
                 保存する ✨
             </button>
-            <div id="statusMsg" class="text-center text-sm font-bold opacity-0 transition-opacity pb-10"></div>
+            <div id="statusMsg" class="text-center text-sm font-bold opacity-0 transition-opacity pb-10 mt-2"></div>
         </div>
     </div>
 
-    <!-- 3. 履歴画面 -->
     <div id="screen-view" class="hidden p-4 max-w-md mx-auto fade-in">
         <h2 class="kawaii-font text-2xl font-bold text-pink-500 mb-6 text-center">これまでの記録</h2>
         <div id="history-container" class="space-y-4">
-            <!-- 履歴 -->
-        </div>
+            </div>
     </div>
 
-    <!-- 下部ナビ -->
     <nav class="bottom-nav no-print">
         <button onclick="switchScreen('menu')" id="nav-menu" class="nav-item active">
             <span class="text-xl">🏠</span>
@@ -319,8 +309,8 @@
     </nav>
 
     <script>
-        // 【重要】ご提示いただいた新しい GAS ウェブアプリ URL を設定済み
-        const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwLBnaIj_p-oq6PaV9YGecsj84gyLXZrqUFpZoEmSXvdt7n-aK_2x0PPZiow_kSIBE/exec";
+        // 【最新のURL】
+        const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwPIsHlIpSg5GruxysF8FIjromO0gCyrKmcjt5g5UtAmQlQa0C-MMolAZ8U4VY3vgqg/exec";
 
         function switchScreen(screen) {
             document.getElementById('screen-menu').classList.add('hidden');
@@ -341,7 +331,6 @@
         }
 
         function calc() {
-            // しゅうにゅう
             const carry = getVal('prevCarry');
             const s = getVal('incomeS');
             const a = getVal('incomeA');
@@ -349,22 +338,17 @@
             const otherI = getVal('incomeOther');
             const displayIncomeTotal = carry + s + a + solar + otherI;
 
-            // 固定費
             const totalFixed = getVal('fixIns1') + getVal('fixIns2') + getVal('fixComm') + 
                                getVal('fixInvest') + getVal('fixMed') + getVal('fixUtil');
 
-            // せいかつひ
             const totalDaily = getVal('dayLiving') + getVal('dayTrans') + getVal('daySpecial') + 
                                getVal('dayComm') + getVal('dayPocket') + getVal('dayOther');
 
             const savings = getVal('savings');
             const totalExpense = totalFixed + totalDaily + savings;
             const finalCarry = displayIncomeTotal - totalExpense;
-
-            // 光熱費じっせき
             const utilSum = getVal('utilWater') + getVal('utilElec');
 
-            // 表示を更新
             const resIncomeEl = document.getElementById('resIncome');
             const resExpenseEl = document.getElementById('resExpense');
             const resCarryEl = document.getElementById('resCarry');
@@ -380,31 +364,40 @@
             const btn = document.getElementById('btnSubmit');
             const status = document.getElementById('statusMsg');
             const payload = {
-                action: 'save',
                 year: document.getElementById('year').value,
                 month: document.getElementById('month').value,
                 carry: document.getElementById('prevCarry').value,
                 income: document.getElementById('resIncome').innerText.replace(/,/g, ''),
                 expense: document.getElementById('resExpense').innerText.replace(/,/g, ''),
                 finalCarry: document.getElementById('resCarry').innerText.replace(/,/g, ''),
-                savings: document.getElementById('savings').value,
-                timestamp: new Date().toLocaleString()
+                savings: document.getElementById('savings').value
             };
 
             btn.disabled = true;
             btn.innerText = "送信中...";
 
             try {
-                await fetch(DEFAULT_GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                status.innerText = "保存できました！💕";
+                // セキュリティブロックを回避する最強設定
+                await fetch(DEFAULT_GAS_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', // ブラウザのブロックを無視して送信
+                    headers: {
+                        'Content-Type': 'text/plain' // 単純なテキストとして送る
+                    },
+                    body: JSON.stringify(payload) 
+                });
+                
+                status.innerText = "保存できたよ！✨";
                 status.style.opacity = "1";
                 status.style.color = "#ff85a2";
             } catch (e) {
-                status.innerText = "エラーかも... 😢";
+                status.innerText = "エラーが起きたかも... 😢";
+                status.style.opacity = "1";
+                status.style.color = "#f43f5e";
             } finally {
                 btn.disabled = false;
                 btn.innerText = "保存する ✨";
-                setTimeout(() => status.style.opacity = "0", 3000);
+                setTimeout(() => status.style.opacity = "0", 4000);
             }
         }
 
@@ -413,7 +406,7 @@
             container.innerHTML = '<div class="text-center py-10 text-pink-300 italic">よみこみ中... 🕊️</div>';
             
             try {
-                const response = await fetch(`${DEFAULT_GAS_URL}?action=read`);
+                const response = await fetch(DEFAULT_GAS_URL);
                 const data = await response.json();
                 
                 if(!data || data.length === 0) {
@@ -425,7 +418,7 @@
                     <div class="app-card p-5 border-l-8 border-pink-400 fade-in">
                         <div class="flex justify-between items-center mb-3">
                             <span class="font-black text-xl text-pink-500 kawaii-font">${row.year}年 ${row.month}月</span>
-                            <span class="text-[8px] text-slate-300">${row.timestamp}</span>
+                            <span class="text-[8px] text-slate-300">${row.timestamp ? new Date(row.timestamp).toLocaleDateString() : ''}</span>
                         </div>
                         <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
                             <div class="bg-slate-50 p-2 rounded-xl">
@@ -444,7 +437,7 @@
                     </div>
                 `).join('');
             } catch (e) {
-                container.innerHTML = '<div class="text-center py-10 text-rose-300 italic">よみこみエラー</div>';
+                container.innerHTML = '<div class="text-center py-10 text-rose-300 italic">よみこみエラー<br>もうすこし待ってから試してね</div>';
             }
         }
 
