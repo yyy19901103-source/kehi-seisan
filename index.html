@@ -5,443 +5,472 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ふたりの暮らし家計簿</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --pink-bg: #fff9fa;
-            --pink-accent: #ffb7c5;
-            --pink-deep: #ff85a2;
-            --text-color: #5d574f;
+            --背景色: #fff9f0;
+            --カード背景: #ffffff;
+            --メイン色: #87ceeb; /* 空色 */
+            --サブ色: #ffb7c5; /* さくら色 */
+            --アクセント: #f9e2af; /* たまご色 */
+            --文字色: #5a524d;
         }
         body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background-color: var(--pink-bg);
-            color: var(--text-color);
-            background-image: radial-gradient(#ffb7c5 0.5px, transparent 0.5px);
-            background-size: 24px 24px;
-            user-select: none;
+            font-family: 'Kiwi Maru', serif;
+            background-color: var(--背景色);
+            color: var(--文字色);
             -webkit-tap-highlight-color: transparent;
         }
-        .kawaii-font { font-family: 'Kiwi Maru', serif; }
-        
-        .app-card {
-            background: white;
-            border-radius: 1.5rem;
-            box-shadow: 0 8px 20px -4px rgba(255, 133, 162, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+        /* 丸みのあるかわいいカード */
+        .まるいカード {
+            background: var(--カード背景);
+            border-radius: 32px;
+            box-shadow: 0 8px 0px rgba(0, 0, 0, 0.03);
+            border: 3px solid #f2eee5;
         }
-
-        input {
-            background: #fdfdfd;
-            border-radius: 0.5rem;
-            border: 1px solid #eee;
-            padding: 8px;
-            font-size: 16px; 
-            outline: none;
+        .入力らん {
+            background: #fff;
+            border: 3px solid #f2eee5;
+            border-radius: 18px;
+            padding: 14px;
             width: 100%;
-            text-align: right;
+            font-size: 18px;
+            transition: all 0.2s;
         }
-        input:focus {
-            border-color: var(--pink-accent);
-            background: white;
+        .入力らん:focus {
+            outline: none;
+            border-color: var(--メイン色);
+            background: #f4fbff;
         }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0 calc(env(safe-area-inset-bottom) + 10px);
-            border-top: 1px solid var(--pink-accent);
-            z-index: 100;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: #aaa;
-            font-size: 10px;
+        .メインボタン {
+            background: var(--メイン色);
+            color: white;
             font-weight: bold;
+            border-radius: 24px;
+            padding: 18px;
+            border-bottom: 6px solid #5fb1d1;
+            transition: all 0.1s;
         }
-        .nav-item.active {
-            color: var(--pink-deep);
+        .メインボタン:active {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
         }
-
-        .hidden { display: none !important; }
-        
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .見出し {
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: #70665f;
+        }
+        .見出しのアイコン {
+            background: var(--アクセント);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        #読み込み中 {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 250, 240, 0.9);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .集計ボックス {
+            text-align: center;
+            padding: 12px 4px;
+            border-radius: 20px;
+            border: 2px solid #f2eee5;
+        }
+        details summary { list-style: none; outline: none; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-12">
 
-    <div id="screen-menu" class="p-6 max-w-md mx-auto fade-in">
-        <div class="py-12 text-center">
-            <div class="text-6xl mb-4 animate-bounce">🏠💕</div>
-            <h1 class="kawaii-font text-3xl font-bold text-pink-500">ふたりの家計簿</h1>
-            <p class="text-xs text-pink-300 font-bold mt-2">未来をふたりで作る記録帳</p>
-        </div>
-
-        <div class="grid gap-4 mt-8">
-            <button onclick="switchScreen('input')" class="app-card p-6 flex items-center justify-between active:scale-95 transition group bg-white">
-                <div class="flex items-center gap-4">
-                    <span class="text-3xl">✏️</span>
-                    <div class="text-left">
-                        <div class="font-bold text-lg text-slate-700">家計簿をつける</div>
-                        <div class="text-[10px] text-pink-400">毎日の記録を保存します</div>
-                    </div>
-                </div>
-                <span class="text-pink-300">▶</span>
-            </button>
-
-            <button onclick="switchScreen('view')" class="app-card p-6 flex items-center justify-between active:scale-95 transition group bg-white">
-                <div class="flex items-center gap-4">
-                    <span class="text-3xl">📖</span>
-                    <div class="text-left">
-                        <div class="font-bold text-lg text-slate-700">これまでの記録</div>
-                        <div class="text-[10px] text-pink-400">過去のデータを見てみるよ</div>
-                    </div>
-                </div>
-                <span class="text-pink-300">▶</span>
-            </button>
-        </div>
+    <div id="読み込み中">
+        <div class="text-6xl animate-bounce mb-4">🍡</div>
+        <p class="font-bold text-gray-400 text-sm">ちょっとまってね...</p>
     </div>
 
-    <div id="screen-input" class="hidden p-4 max-w-md mx-auto fade-in">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="kawaii-font text-xl font-bold text-pink-500">家計簿をつける</h2>
-            <div class="flex items-center gap-1 bg-white px-3 py-1 rounded-full shadow-sm">
-                <input type="number" id="year" value="2026" class="w-14 text-center text-xs border-none bg-transparent">
-                <span class="text-[10px] text-pink-300">年</span>
-                <input type="number" id="month" value="1" class="w-8 text-center text-sm font-bold border-none bg-transparent text-pink-500">
-                <span class="text-[10px] text-pink-300">月</span>
-            </div>
+    <header class="pt-10 pb-4 text-center">
+        <div class="inline-block px-5 py-1 bg-white border-2 border-gray-100 rounded-full text-[12px] text-gray-400 mb-2 font-bold tracking-widest">
+            2026ねんの きろく
         </div>
+        <h1 class="text-2xl font-bold tracking-tighter text-gray-700">ふたりの暮らし家計簿</h1>
+    </header>
 
-        <div class="space-y-6">
-            <div class="app-card p-5">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-pink-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">しゅうにゅう</span>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-500">前の月ののこり</span>
-                        <input type="number" id="prevCarry" onchange="calc()" value="10000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1">
-                            <span class="text-[10px] text-slate-400 block ml-1">お給料：Ｓ</span>
-                            <input type="number" id="incomeS" onchange="calc()" value="435000" inputmode="numeric">
-                        </div>
-                        <div class="space-y-1">
-                            <span class="text-[10px] text-slate-400 block ml-1">お給料：Ａ</span>
-                            <input type="number" id="incomeA" onchange="calc()" value="98000" inputmode="numeric">
-                        </div>
-                        <div class="space-y-1">
-                            <span class="text-[10px] text-slate-400 block ml-1">売電</span>
-                            <input type="number" id="incomeSolar" onchange="calc()" value="0" inputmode="numeric">
-                        </div>
-                        <div class="space-y-1">
-                            <span class="text-[10px] text-slate-400 block ml-1">その他</span>
-                            <input type="number" id="incomeOther" onchange="calc()" value="0" inputmode="numeric">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="app-card p-5">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-blue-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">決まったしはらい</span>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs">保険(1)</span>
-                        <input type="number" id="fixIns1" onchange="calc()" value="15000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs">保険(2)</span>
-                        <input type="number" id="fixIns2" onchange="calc()" value="6800" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-pink-500">ちゅピコム</span>
-                        <input type="number" id="fixComm" onchange="calc()" value="2200" inputmode="numeric" class="w-32 font-bold text-pink-500">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs">投資</span>
-                        <input type="number" id="fixInvest" onchange="calc()" value="40000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs">医療</span>
-                        <input type="number" id="fixMed" onchange="calc()" value="5000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-blue-500">光熱費(予算)</span>
-                        <input type="number" id="fixUtil" onchange="calc()" value="15000" inputmode="numeric" class="w-32 font-bold">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-2 bg-slate-50 p-2 rounded-xl">
-                        <div class="flex items-center gap-1">
-                            <span class="text-[9px] text-slate-400">水道:</span>
-                            <input type="number" id="utilWater" onchange="calc()" value="3496" inputmode="numeric" class="text-[10px] p-1">
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <span class="text-[9px] text-slate-400">電気:</span>
-                            <input type="number" id="utilElec" onchange="calc()" value="13638" inputmode="numeric" class="text-[10px] p-1">
-                        </div>
-                    </div>
-                    <div class="text-right text-[10px] font-bold text-slate-400">
-                        光熱費じっせき: ¥ <span id="actualUtilSum">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="app-card p-5">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-emerald-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">せいかつひ</span>
-                </div>
-                <div class="grid gap-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs">やりくり費</span>
-                        <input type="number" id="dayLiving" onchange="calc()" value="90000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs">交通費</span>
-                        <input type="number" id="dayTrans" onchange="calc()" value="21000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs">特別費</span>
-                        <input type="number" id="daySpecial" onchange="calc()" value="30000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-500">通信</span>
-                        <input type="number" id="dayComm" onchange="calc()" value="18000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-500">おこづかい</span>
-                        <input type="number" id="dayPocket" onchange="calc()" value="30000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-500">予備費</span>
-                        <input type="number" id="dayOther" onchange="calc()" value="30000" inputmode="numeric" class="w-32">
-                    </div>
-                    <div class="flex justify-between items-center border-t border-slate-100 pt-3">
-                        <span class="text-xs font-bold text-emerald-600">貯金</span>
-                        <input type="number" id="savings" onchange="calc()" value="240000" inputmode="numeric" class="w-32 font-bold text-emerald-600">
-                    </div>
-                </div>
-            </div>
-
-            <div class="app-card p-5">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-purple-400 text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest">しゅうよさん</span>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <div class="text-center p-2 bg-purple-50 rounded-xl">
-                        <span class="text-[8px] font-bold text-purple-400">1週め</span>
-                        <input type="number" id="w1" value="40000" inputmode="numeric" class="text-center text-xs p-0 border-none bg-transparent">
-                    </div>
-                    <div class="text-center p-2 bg-purple-50 rounded-xl">
-                        <span class="text-[8px] font-bold text-purple-400">2週め</span>
-                        <input type="number" id="w2" value="15000" inputmode="numeric" class="text-center text-xs p-0 border-none bg-transparent">
-                    </div>
-                    <div class="text-center p-2 bg-purple-50 rounded-xl">
-                        <span class="text-[8px] font-bold text-purple-400">3週め</span>
-                        <input type="number" id="w3" value="6000" inputmode="numeric" class="text-center text-xs p-0 border-none bg-transparent">
-                    </div>
-                    <div class="text-center p-2 bg-purple-50 rounded-xl">
-                        <span class="text-[8px] font-bold text-purple-400">4週め</span>
-                        <input type="number" id="w4" value="15000" inputmode="numeric" class="text-center text-xs p-0 border-none bg-transparent">
-                    </div>
-                    <div class="text-center p-2 bg-slate-100 rounded-xl col-span-2">
-                        <span class="text-[8px] font-bold text-slate-400">予備費</span>
-                        <input type="number" id="wRes" value="14000" inputmode="numeric" class="text-center text-xs p-0 border-none bg-transparent">
-                    </div>
-                </div>
-            </div>
-
-            <div class="app-card p-6 bg-gradient-to-br from-pink-500 to-rose-400 text-white shadow-lg">
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center opacity-80 text-xs">
-                        <span>しゅうにゅう（繰越込）</span>
-                        <span class="font-mono font-bold">¥ <span id="resIncome">0</span></span>
-                    </div>
-                    <div class="flex justify-between items-center opacity-80 text-xs">
-                        <span>ししゅつ（合計）</span>
-                        <span class="font-mono font-bold">¥ <span id="resExpense">0</span></span>
-                    </div>
-                    <div class="pt-3 border-t border-white/30 flex justify-between items-center">
-                        <span class="font-black text-sm">つぎの月へのこす分</span>
-                        <span class="text-2xl font-black font-mono">¥ <span id="resCarry">0</span></span>
-                    </div>
-                </div>
-            </div>
-
-            <button id="btnSubmit" onclick="submitToSheets()" class="w-full py-5 bg-pink-500 text-white rounded-3xl font-black text-xl shadow-lg active:scale-95 transition-all">
-                保存する ✨
+    <main class="px-5 max-w-md mx-auto space-y-6">
+        
+        <!-- メニュー画面 -->
+        <div id="画面-メニュー" class="grid grid-cols-2 gap-4">
+            <button onclick="ページ切替('入力')" class="まるいカード p-8 flex flex-col items-center">
+                <span class="text-6xl mb-3">✏️</span>
+                <span class="font-bold text-sm">ノートをかく</span>
             </button>
-            <div id="statusMsg" class="text-center text-sm font-bold opacity-0 transition-opacity pb-10 mt-2"></div>
+            <button onclick="履歴をよむ()" class="まるいカード p-8 flex flex-col items-center">
+                <span class="text-6xl mb-3">📋</span>
+                <span class="font-bold text-sm">履歴をみる</span>
+            </button>
+        </div>
+
+        <!-- 入力画面 -->
+        <div id="画面-入力" class="hidden space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <button onclick="ページ切替('メニュー')" class="text-gray-400 font-bold text-xs bg-white px-5 py-2 rounded-full border border-gray-100 shadow-sm">
+                    ← もどる
+                </button>
+                <button onclick="見本をいれる()" class="text-[10px] px-4 py-2 rounded-full text-blue-400 bg-blue-50 font-bold border-2 border-blue-100 shadow-sm">
+                    ノートの例をいれる
+                </button>
+            </div>
+            
+            <form id="家計簿フォーム" class="まるいカード p-6 space-y-8">
+                <!-- 年月 -->
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-[10px] text-gray-400 font-bold ml-2 mb-1 block">とし</label>
+                        <input type="number" name="year" id="入力-年" class="入力らん bg-gray-50 border-none font-bold" readonly>
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-[10px] text-gray-400 font-bold ml-2 mb-1 block">つき</label>
+                        <select name="month" id="入力-月" class="入力らん font-bold"></select>
+                    </div>
+                </div>
+
+                <!-- 収入 -->
+                <div>
+                    <div class="見出し"><div class="見出しのアイコン">💰</div> はいってきた おかね</div>
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <span class="text-[10px] text-gray-400 absolute -top-2.5 left-4 bg-white px-1">前月ののこり</span>
+                            <input type="number" name="prevCarry" class="入力らん 計算対象" value="0" inputmode="numeric">
+                        </div>
+                        <div class="relative">
+                            <span class="text-[10px] text-gray-400 absolute -top-2.5 left-4 bg-white px-1">しんりんの給料</span>
+                            <input type="number" name="incomeS" class="入力らん 計算対象" value="0" inputmode="numeric">
+                        </div>
+                        <div class="relative">
+                            <span class="text-[10px] text-gray-400 absolute -top-2.5 left-4 bg-white px-1">まきの給料（ボーナス込）</span>
+                            <input type="number" name="incomeA" class="入力らん 計算対象" value="0" inputmode="numeric">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="relative">
+                                <span class="text-[10px] text-gray-400 absolute -top-2.5 left-4 bg-white px-1">売電</span>
+                                <input type="number" name="incomeSolar" class="入力らん 計算対象" value="0" inputmode="numeric">
+                            </div>
+                            <div class="relative">
+                                <span class="text-[10px] text-gray-400 absolute -top-2.5 left-4 bg-white px-1">その他</span>
+                                <input type="number" name="incomeOther" class="入力らん 計算対象" value="0" inputmode="numeric">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 固定支出 -->
+                <div>
+                    <div class="見出し"><div class="見出しのアイコン">📉</div> 決まっている支出</div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <label><span class="text-[10px] text-gray-400 font-bold ml-2">保険(1)</span><input type="number" name="fixIns1" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                            <label><span class="text-[10px] text-gray-400 font-bold ml-2">保険(2)</span><input type="number" name="fixIns2" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label><span class="text-[10px] text-gray-400 font-bold ml-2">ちゅぴcom</span><input type="number" name="fixComm" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                            <label><span class="text-[10px] text-gray-400 font-bold ml-2">投資</span><input type="number" name="fixInvest" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label><span class="text-[10px] text-gray-400 font-bold ml-2">医療</span><input type="number" name="fixMed" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                            <label><span class="text-[10px] text-gray-400 font-bold ml-2">光熱費の予算</span><input type="number" name="fixUtil" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl grid grid-cols-2 gap-3 shadow-inner">
+                            <span class="col-span-2 text-[10px] text-gray-400 font-bold text-center">実際の光熱費（メモ）</span>
+                            <label><span class="text-[10px] text-gray-400 ml-2">水道</span><input type="number" name="utilWater" class="入力らん" value="0" inputmode="numeric"></label>
+                            <label><span class="text-[10px] text-gray-400 ml-2">電気</span><input type="number" name="utilElec" class="入力らん" value="0" inputmode="numeric"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 生活費 -->
+                <div>
+                    <div class="見出し"><div class="見出しのアイコン">📅</div> しゅうごとの よさん</div>
+                    <div class="space-y-5">
+                        <div class="p-5 bg-blue-50/50 border-2 border-blue-100 rounded-[32px] shadow-inner">
+                            <span class="text-[11px] font-bold text-blue-400 block mb-3 text-center tracking-tighter">やりくり費 (1〜4週目・予備)</span>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label><span class="text-[10px] block text-center text-gray-400">1週目</span><input type="number" name="day1W" class="入力らん text-center p-2 計算対象" value="0" inputmode="numeric"></label>
+                                <label><span class="text-[10px] block text-center text-gray-400">2週目</span><input type="number" name="day2W" class="入力らん text-center p-2 計算対象" value="0" inputmode="numeric"></label>
+                                <label><span class="text-[10px] block text-center text-gray-400">3週目</span><input type="number" name="day3W" class="入力らん text-center p-2 計算対象" value="0" inputmode="numeric"></label>
+                                <label><span class="text-[10px] block text-center text-gray-400">4週目</span><input type="number" name="day4W" class="入力らん text-center p-2 計算対象" value="0" inputmode="numeric"></label>
+                                <label class="col-span-2"><span class="text-[10px] block text-center text-gray-400">予備のお金</span><input type="number" name="dayReserve" class="入力らん text-center p-2 計算対象" value="0" inputmode="numeric"></label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <label><span class="text-[10px] text-gray-400 mb-1 ml-2 block font-bold">交通費</span><input type="number" name="dayTrans" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                            <label><span class="text-[10px] text-gray-400 mb-1 ml-2 block font-bold">特別なひ</span><input type="number" name="daySpecial" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label><span class="text-[10px] text-gray-400 mb-1 ml-2 block font-bold">スマホ代</span><input type="number" name="dayComm" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                            <label><span class="text-[10px] text-blue-500 font-bold mb-1 ml-2 block text-center">今月の貯金</span><input type="number" name="savings" class="入力らん 計算対象 border-blue-100" value="0" inputmode="numeric"></label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 border-t-2 border-gray-50 pt-4">
+                            <label><span class="text-[10px] text-gray-400 mb-1 ml-2 block font-bold">おこづかい(芯)</span><input type="number" name="dayPocketS" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                            <label><span class="text-[10px] text-gray-400 mb-1 ml-2 block font-bold">おこづかい(愛)</span><input type="number" name="dayPocketA" class="入力らん 計算対象" value="0" inputmode="numeric"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 集計サマリー -->
+                <div class="grid grid-cols-3 gap-2 pt-8 border-t-4 border-gray-50">
+                    <div class="集計ボックス bg-gray-700 text-white shadow-md">
+                        <p class="text-[8px] font-bold mb-1">はいった</p>
+                        <p class="text-[11px] font-bold" id="表示-収入">0円</p>
+                    </div>
+                    <div class="集計ボックス bg-gray-100 text-gray-500">
+                        <p class="text-[8px] font-bold mb-1">つかった</p>
+                        <p class="text-[11px] font-bold" id="表示-支出">0円</p>
+                    </div>
+                    <div class="集計ボックス bg-blue-400 text-white shadow-md">
+                        <p class="text-[8px] font-bold mb-1">のこった</p>
+                        <p class="text-[11px] font-bold" id="表示-繰越">0円</p>
+                    </div>
+                </div>
+
+                <button type="button" onclick="保存する()" class="メインボタン w-full shadow-lg text-lg">
+                    この内容で 保存する
+                </button>
+            </form>
+        </div>
+
+        <!-- 履歴画面 -->
+        <div id="画面-履歴" class="hidden space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <button onclick="ページ切替('メニュー')" class="text-gray-400 font-bold text-xs bg-white px-5 py-2 rounded-full border border-gray-100 shadow-sm">
+                    ← もどる
+                </button>
+                <p class="text-[10px] text-gray-400 font-bold">※おなじ月は最新だけ表示しているよ</p>
+            </div>
+            <div id="履歴リスト" class="space-y-4">
+            </div>
+        </div>
+    </main>
+
+    <!-- メッセージ用モーダル -->
+    <div id="モーダル" class="hidden fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-[2000] p-6">
+        <div class="bg-white p-10 rounded-[40px] w-full max-w-xs text-center border-4 border-gray-100 shadow-2xl">
+            <div id="モーダル-アイコン" class="text-7xl mb-4"></div>
+            <div id="モーダル-テキスト" class="mb-8 font-bold text-gray-600 leading-relaxed text-sm"></div>
+            <button onclick="モーダル閉じる()" class="w-full py-4 rounded-2xl bg-blue-400 text-white font-bold shadow-lg">わかった！</button>
         </div>
     </div>
-
-    <div id="screen-view" class="hidden p-4 max-w-md mx-auto fade-in">
-        <h2 class="kawaii-font text-2xl font-bold text-pink-500 mb-6 text-center">これまでの記録</h2>
-        <div id="history-container" class="space-y-4">
-            </div>
-    </div>
-
-    <nav class="bottom-nav no-print">
-        <button onclick="switchScreen('menu')" id="nav-menu" class="nav-item active">
-            <span class="text-xl">🏠</span>
-            <span>メニュー</span>
-        </button>
-        <button onclick="switchScreen('input')" id="nav-input" class="nav-item">
-            <span class="text-xl">✏️</span>
-            <span>つける</span>
-        </button>
-        <button onclick="switchScreen('view')" id="nav-view" class="nav-item">
-            <span class="text-xl">📖</span>
-            <span>みる</span>
-        </button>
-    </nav>
 
     <script>
-        // 【最新のURL】
-        const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwPIsHlIpSg5GruxysF8FIjromO0gCyrKmcjt5g5UtAmQlQa0C-MMolAZ8U4VY3vgqg/exec";
+        const GASのURL = "https://script.google.com/macros/s/AKfycbyTCsrfKanQ6A6L2DAdeP4GHU6nXyKqF8-eM0tBwgegmYWkD6gxMfFXDacI0-ncVu_s/exec";
 
-        function switchScreen(screen) {
-            document.getElementById('screen-menu').classList.add('hidden');
-            document.getElementById('screen-input').classList.add('hidden');
-            document.getElementById('screen-view').classList.add('hidden');
-            document.getElementById(`screen-${screen}`).classList.remove('hidden');
+        window.onload = () => {
+            const 今 = new Date();
+            document.getElementById('入力-年').value = 2026; // 2026年固定ベース
+            const 月選択 = document.getElementById('入力-月');
+            for(let i=1; i<=12; i++) {
+                const 選 = document.createElement('option');
+                選.value = i; 選.textContent = i + "月";
+                if(i === 今.getMonth() + 1) 選.selected = true;
+                月選択.appendChild(選);
+            }
+            計算の準備();
+        };
 
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${screen}`).classList.add('active');
-
-            if(screen === 'view') fetchFromSheets();
-            window.scrollTo({top: 0, behavior: 'smooth'});
+        function ページ切替(名) {
+            document.getElementById('画面-メニュー').classList.toggle('hidden', 名 !== 'メニュー');
+            document.getElementById('画面-入力').classList.toggle('hidden', 名 !== '入力');
+            document.getElementById('画面-履歴').classList.toggle('hidden', 名 !== '履歴');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function getVal(id) {
-            const el = document.getElementById(id);
-            return el ? (Number(el.value) || 0) : 0;
+        function 計算の準備() {
+            document.querySelectorAll('.計算対象').forEach(el => {
+                el.addEventListener('input', 合計計算);
+            });
         }
 
-        function calc() {
-            const carry = getVal('prevCarry');
-            const s = getVal('incomeS');
-            const a = getVal('incomeA');
-            const solar = getVal('incomeSolar');
-            const otherI = getVal('incomeOther');
-            const displayIncomeTotal = carry + s + a + solar + otherI;
-
-            const totalFixed = getVal('fixIns1') + getVal('fixIns2') + getVal('fixComm') + 
-                               getVal('fixInvest') + getVal('fixMed') + getVal('fixUtil');
-
-            const totalDaily = getVal('dayLiving') + getVal('dayTrans') + getVal('daySpecial') + 
-                               getVal('dayComm') + getVal('dayPocket') + getVal('dayOther');
-
-            const savings = getVal('savings');
-            const totalExpense = totalFixed + totalDaily + savings;
-            const finalCarry = displayIncomeTotal - totalExpense;
-            const utilSum = getVal('utilWater') + getVal('utilElec');
-
-            const resIncomeEl = document.getElementById('resIncome');
-            const resExpenseEl = document.getElementById('resExpense');
-            const resCarryEl = document.getElementById('resCarry');
-            const actualUtilSumEl = document.getElementById('actualUtilSum');
-            
-            if (resIncomeEl) resIncomeEl.innerText = displayIncomeTotal.toLocaleString();
-            if (resExpenseEl) resExpenseEl.innerText = totalExpense.toLocaleString();
-            if (resCarryEl) resCarryEl.innerText = finalCarry.toLocaleString();
-            if (actualUtilSumEl) actualUtilSumEl.innerText = utilSum.toLocaleString();
-        }
-
-        async function submitToSheets() {
-            const btn = document.getElementById('btnSubmit');
-            const status = document.getElementById('statusMsg');
-            const payload = {
-                year: document.getElementById('year').value,
-                month: document.getElementById('month').value,
-                carry: document.getElementById('prevCarry').value,
-                income: document.getElementById('resIncome').innerText.replace(/,/g, ''),
-                expense: document.getElementById('resExpense').innerText.replace(/,/g, ''),
-                finalCarry: document.getElementById('resCarry').innerText.replace(/,/g, ''),
-                savings: document.getElementById('savings').value
+        function 見本をいれる() {
+            const フォーム = document.getElementById('家計簿フォーム');
+            const 値 = {
+                prevCarry: 10000, incomeS: 435000, incomeA: 98000, incomeSolar: 0, incomeOther: 0,
+                fixIns1: 15000, fixIns2: 6800, fixComm: 2200, fixInvest: 40000, fixMed: 5000, fixUtil: 15000,
+                utilWater: 3496, utilElec: 13638,
+                day1W: 40000, day2W: 15000, day3W: 6000, day4W: 15000, dayReserve: 14000,
+                dayTrans: 21000, daySpecial: 30000, dayComm: 18000, dayPocketS: 30000, dayPocketA: 30000, savings: 240000
             };
+            for (const キー in 値) {
+                const el = フォーム.querySelector(`[name="${キー}"]`);
+                if (el) el.value = 値[キー];
+            }
+            合計計算();
+            モーダル表示("🍡", "2026年1月分のノート例をいれたよ！");
+        }
 
-            btn.disabled = true;
-            btn.innerText = "送信中...";
+        function 合計計算() {
+            const フォームデータ = new FormData(document.getElementById('家計簿フォーム'));
+            const 数値 = (名) => parseFloat(フォームデータ.get(名)) || 0;
 
+            const 収入 = 数値('prevCarry') + 数値('incomeS') + 数値('incomeA') + 数値('incomeSolar') + 数値('incomeOther');
+            const 生活費内 = 数値('day1W') + 数値('day2W') + 数値('day3W') + 数値('day4W') + 数値('dayReserve');
+            const 固定費 = 数値('fixIns1') + 数値('fixIns2') + 数値('fixComm') + 数値('fixInvest') + 数値('fixMed') + 数値('fixUtil');
+            const その他 = 数値('dayTrans') + 数値('daySpecial') + 数値('dayComm') + 数値('dayPocketS') + 数値('dayPocketA') + 数値('savings');
+            
+            const 支出 = 固定費 + 生活費内 + その他;
+            const 繰越 = 収入 - 支出;
+
+            document.getElementById('表示-収入').textContent = 収入.toLocaleString() + "円";
+            document.getElementById('表示-支出').textContent = 支出.toLocaleString() + "円";
+            document.getElementById('表示-繰越').textContent = 繰越.toLocaleString() + "円";
+
+            return { 収入, 支出, 繰越 };
+        }
+
+        async function 保存する() {
+            const 結果 = 合計計算();
+            const フォームデータ = new FormData(document.getElementById('家計簿フォーム'));
+            const データ = {
+                timestamp: new Date().toLocaleString("ja-JP"),
+                resIncome: 結果.収入, resExpense: 結果.支出, resCarry: 結果.繰越
+            };
+            for(let [キー, 値] of フォームデータ.entries()) データ[キー] = isNaN(値) ? 値 : parseFloat(値);
+
+            読み込み表示(true);
             try {
-                // セキュリティブロックを回避する最強設定
-                await fetch(DEFAULT_GAS_URL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', // ブラウザのブロックを無視して送信
-                    headers: {
-                        'Content-Type': 'text/plain' // 単純なテキストとして送る
-                    },
-                    body: JSON.stringify(payload) 
-                });
-                
-                status.innerText = "保存できたよ！✨";
-                status.style.opacity = "1";
-                status.style.color = "#ff85a2";
-            } catch (e) {
-                status.innerText = "エラーが起きたかも... 😢";
-                status.style.opacity = "1";
-                status.style.color = "#f43f5e";
+                // 上書き禁止：GAS側でappendRowが行われます
+                const 送信 = await fetch(GASのURL, { method: 'POST', body: JSON.stringify(データ) });
+                const 返答 = await 送信.json();
+                if(返答.status === 'success') {
+                    モーダル表示("⭐", "新しく保存したよ！\n(履歴には最新だけ表示されます)");
+                    document.getElementById('家計簿フォーム').reset();
+                    document.getElementById('入力-年').value = 2026;
+                    ページ切替('メニュー');
+                } else { throw new Error(返答.message); }
+            } catch(e) {
+                モーダル表示("💦", "しっぱいしちゃった...\nもう一度やってみてね");
             } finally {
-                btn.disabled = false;
-                btn.innerText = "保存する ✨";
-                setTimeout(() => status.style.opacity = "0", 4000);
+                読み込み表示(false);
             }
         }
 
-        async function fetchFromSheets() {
-            const container = document.getElementById('history-container');
-            container.innerHTML = '<div class="text-center py-10 text-pink-300 italic">よみこみ中... 🕊️</div>';
-            
+        async function 履歴をよむ() {
+            読み込み表示(true);
             try {
-                const response = await fetch(DEFAULT_GAS_URL);
-                const data = await response.json();
-                
-                if(!data || data.length === 0) {
-                    container.innerHTML = '<div class="text-center py-10 text-slate-300">まだ記録がないよ</div>';
-                    return;
-                }
+                const 取得 = await fetch(GASのURL);
+                const 返答 = await 取得.json();
+                if(返答.status === 'success') {
+                    履歴を表示(返答.data);
+                    ページ切替('履歴');
+                } else { throw new Error(返答.message); }
+            } catch(e) {
+                モーダル表示("💧", "データがとれなかったよ");
+            } finally {
+                読み込み表示(false);
+            }
+        }
 
-                container.innerHTML = data.reverse().map(row => `
-                    <div class="app-card p-5 border-l-8 border-pink-400 fade-in">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="font-black text-xl text-pink-500 kawaii-font">${row.year}年 ${row.month}月</span>
-                            <span class="text-[8px] text-slate-300">${row.timestamp ? new Date(row.timestamp).toLocaleDateString() : ''}</span>
+        function 履歴を表示(データ) {
+            const リスト = document.getElementById('履歴リスト');
+            リスト.innerHTML = "";
+            if (!データ || データ.length === 0) {
+                リスト.innerHTML = "<div class='まるいカード p-10 text-center text-gray-400 font-bold'>まだきろくがないよ🌱</div>";
+                return;
+            }
+
+            // 【フィルタリング】同じ月があれば「一番新しい行」だけを抽出
+            const 最新マップ = new Map();
+            データ.forEach(行 => {
+                const キー = `${行.year}-${行.month}`;
+                最新マップ.set(キー, 行);
+            });
+
+            const 表示データ = Array.from(最新マップ.values()).reverse();
+            
+            表示データ.forEach(行 => {
+                const カード = document.createElement('div');
+                カード.className = "まるいカード overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500 mb-4";
+                カード.innerHTML = `
+                    <div class="px-6 py-4 flex justify-between items-baseline border-b-2 border-gray-50 bg-gray-50/20">
+                        <span class="font-bold text-gray-700 text-lg">${行.year}年 ${行.month}月</span>
+                        <span class="text-[9px] text-gray-300 font-bold tracking-tighter">${行.timestamp}</span>
+                    </div>
+
+                    <div class="px-6 py-5 grid grid-cols-3 gap-3">
+                        <div class="集計ボックス border-none bg-gray-50/50">
+                            <p class="text-[8px] text-gray-400 font-bold mb-1">はいった</p>
+                            <p class="text-[10px] font-bold">¥${(行.resIncome||0).toLocaleString()}</p>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 text-[10px] text-center">
-                            <div class="bg-slate-50 p-2 rounded-xl">
-                                <div class="text-slate-400 mb-1 tracking-tighter">しゅうにゅう</div>
-                                <div class="font-bold">¥${Number(row.income).toLocaleString()}</div>
-                            </div>
-                            <div class="bg-slate-50 p-2 rounded-xl">
-                                <div class="text-slate-400 mb-1 tracking-tighter">ししゅつ</div>
-                                <div class="font-bold">¥${Number(row.expense).toLocaleString()}</div>
-                            </div>
-                            <div class="bg-pink-50 p-2 rounded-xl">
-                                <div class="text-pink-400 mb-1 font-bold tracking-tighter">のこり</div>
-                                <div class="font-bold text-pink-600">¥${Number(row.finalCarry).toLocaleString()}</div>
-                            </div>
+                        <div class="集計ボックス border-none bg-gray-50/50">
+                            <p class="text-[8px] text-gray-400 font-bold mb-1">つかった</p>
+                            <p class="text-[10px] font-bold">¥${(行.resExpense||0).toLocaleString()}</p>
+                        </div>
+                        <div class="集計ボックス border-none bg-blue-400 text-white shadow-sm">
+                            <p class="text-[8px] opacity-80 font-bold mb-1">のこった</p>
+                            <p class="text-[10px] font-bold">¥${(行.resCarry||0).toLocaleString()}</p>
                         </div>
                     </div>
-                `).join('');
-            } catch (e) {
-                container.innerHTML = '<div class="text-center py-10 text-rose-300 italic">よみこみエラー<br>もうすこし待ってから試してね</div>';
-            }
+
+                    <details class="group">
+                        <summary class="text-center text-[10px] text-gray-400 font-bold cursor-pointer py-3 border-t-2 border-gray-50 bg-white hover:bg-gray-50 transition-colors tracking-widest">
+                            なかみを詳しくみる ▾
+                        </summary>
+                        <div class="px-6 pb-6 pt-3 space-y-5 text-[11px] text-gray-600 bg-gray-50/50">
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+                                <p class="col-span-2 text-[10px] font-bold text-blue-300 mb-1 border-b border-blue-100 text-center">はいってきた おかね</p>
+                                <div class="flex justify-between"><span>前月より:</span><span>¥${(行.prevCarry||0).toLocaleString()}</span></div>
+                                <div class="flex justify-between"><span>しんりん:</span><span>¥${(行.incomeS||0).toLocaleString()}</span></div>
+                                <div class="flex justify-between"><span>まき:</span><span>¥${(行.incomeA||0).toLocaleString()}</span></div>
+                                <div class="flex justify-between"><span>売電/他:</span><span>¥${((行.incomeSolar||0)+(行.incomeOther||0)).toLocaleString()}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+                                <p class="col-span-2 text-[10px] font-bold text-blue-300 mb-1 border-b border-blue-100 text-center">きまっている 支出</p>
+                                <div class="flex justify-between"><span>保険:</span><span>¥${((行.fixIns1||0)+(行.fixIns2||0)).toLocaleString()}</span></div>
+                                <div class="flex justify-between"><span>ちゅぴcom:</span><span>¥${(行.fixComm||0).toLocaleString()}</span></div>
+                                <div class="flex justify-between"><span>投資:</span><span>¥${(行.fixInvest||0).toLocaleString()}</span></div>
+                                <div class="flex justify-between"><span>光熱費予算:</span><span>¥${(行.fixUtil||0).toLocaleString()}</span></div>
+                                <div class="flex justify-between text-[10px] text-gray-400 italic"><span>(水道/電気):</span><span>¥${(行.utilWater||0).toLocaleString()}/${(行.utilElec||0).toLocaleString()}</span></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+                                <p class="col-span-2 text-[10px] font-bold text-blue-300 mb-1 border-b border-blue-100 text-center">しゅうごとの よさん</p>
+                                <span>1週目: ¥${(行.day1W||0).toLocaleString()}</span><span>2週目: ¥${(行.day2W||0).toLocaleString()}</span>
+                                <span>3週目: ¥${(行.day3W||0).toLocaleString()}</span><span>4週目: ¥${(行.day4W||0).toLocaleString()}</span>
+                                <span class="col-span-2">予備のお金: ¥${(行.dayReserve||0).toLocaleString()}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+                                <p class="col-span-2 text-[10px] font-bold text-blue-300 mb-1 border-b border-blue-100 text-center">ほかのおかね・貯金</p>
+                                <div class="flex justify-between"><span>交通/特別/通信:</span><span>¥${((行.dayTrans||0)+(行.daySpecial||0)+(行.dayComm||0)).toLocaleString()}</span></div>
+                                <div class="flex justify-between"><span>おこづかい(芯/愛):</span><span>¥${(行.dayPocketS||0).toLocaleString()}/${(行.dayPocketA||0).toLocaleString()}</span></div>
+                                <div class="flex justify-between font-bold text-blue-500 bg-blue-50/50 px-2 rounded-lg"><span>今月の純貯金:</span><span>¥${(行.savings||0).toLocaleString()}</span></div>
+                            </div>
+                        </div>
+                    </details>
+                `;
+                リスト.appendChild(カード);
+            });
         }
 
-        window.onload = calc;
+        function 読み込み表示(フラグ) {
+            document.getElementById('読み込み中').style.display = フラグ ? 'flex' : 'none';
+        }
+        function モーダル表示(アイコン, テキスト) {
+            document.getElementById('モーダル-アイコン').textContent = アイコン;
+            document.getElementById('モーダル-テキスト').innerText = テキスト;
+            document.getElementById('モーダル').classList.remove('hidden');
+        }
+        function モーダル閉じる() {
+            document.getElementById('モーダル').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
