@@ -3,746 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- LINEプレビュー（OGP）修正 -->
     <title>ふたりの暮らし家計簿</title>
+    <meta property="og:title" content="ふたりの暮らし家計簿">
+    <meta property="og:description" content="2026年からの家計管理。AI解析でノートの内容を自動入力できる、ふたりのためのスマート家計簿。">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://fonts.gstatic.com/s/i/materialiconsoutlined/auto_fix_high/v14/24px.svg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --文字色: #5a524d;
-            --メイン色: #87ceeb;
-            --サブ色: #ffb7c5;
-            --アクセント: #f9e2af;
-        }
-
         body {
             font-family: 'Kiwi Maru', serif;
-            color: var(--文字色);
-            overflow-x: hidden;
-            min-height: 100vh;
+            background-color: #fffafb;
+            color: #5d5555;
             -webkit-tap-highlight-color: transparent;
-            background-color: #fff9f0;
         }
-
-        /* 絶景！オーロラ流体背景 */
-        #背景キャンバス {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            filter: blur(60px);
-            opacity: 0.85;
-            pointer-events: none;
+        .kawaii-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(255, 192, 203, 0.15);
+            border: 1px solid #fff0f3;
         }
-
-        /* 超高級グラスモルフィズム + 光の反射 */
-        .ガラスのカード {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.05), 
-                inset 0 2px 10px rgba(255,255,255,0.8),
-                inset 0 -2px 10px rgba(255,255,255,0.3);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-        }
-        .ガラスのカード:active {
-            transform: scale(0.97);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03), inset 0 2px 10px rgba(255,255,255,0.8);
-        }
-
-        /* ふわぷる入力欄 */
-        .入力らん {
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px solid transparent;
-            border-radius: 20px;
-            padding: 16px;
+        .input-box {
+            background: #fffafa;
+            border: 2px solid #ffe4e9;
+            border-radius: 12px;
+            padding: 10px;
             width: 100%;
-            font-size: 18px;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-size: 16px;
+            transition: all 0.3s;
         }
-        .入力らん:focus {
+        .input-box:focus {
             outline: none;
-            border-color: rgba(135, 206, 235, 0.6);
-            background: #ffffff;
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(135, 206, 235, 0.25), inset 0 0 0 2px rgba(135, 206, 235, 0.1);
+            border-color: #ffb6c1;
+            background: white;
         }
-
-        /* ぽよんボタン ＆ シャインエフェクト */
-        .メインボタン {
-            background: linear-gradient(135deg, #87ceeb, #ffb7c5);
+        .btn-main {
+            background: linear-gradient(135deg, #ff99aa 0%, #ff8095 100%);
             color: white;
             font-weight: bold;
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 12px 30px rgba(255, 183, 197, 0.5), inset 0 2px 5px rgba(255,255,255,0.5);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: none;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        .メインボタン::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
-            transform: rotate(30deg);
-            animation: シャイン 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes シャイン {
-            0% { transform: translateX(-100%) rotate(30deg); }
-            20%, 100% { transform: translateX(100%) rotate(30deg); }
-        }
-        .メインボタン:active {
-            transform: scale(0.92) rotate(-2deg);
-            box-shadow: 0 4px 10px rgba(255, 183, 197, 0.3);
-        }
-
-        /* セクション見出し */
-        .見出し {
-            font-weight: bold;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-left: 8px;
-            color: #6a5e55;
-            position: relative;
-        }
-        .アイコン枠 {
-            background: rgba(249, 226, 175, 0.9);
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border-radius: 16px;
-            box-shadow: 0 6px 15px rgba(249, 226, 175, 0.7), inset 0 2px 5px rgba(255,255,255,0.6);
-            font-size: 1.3rem;
-            animation: ふわふわ 3s infinite ease-in-out alternate;
+            padding: 16px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(255, 128, 149, 0.3);
         }
-
-        @keyframes ふわふわ {
-            0% { transform: translateY(0px) rotate(0deg); }
-            100% { transform: translateY(-5px) rotate(8deg); }
+        .btn-ai {
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            color: white;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
         }
-
-        /* 順次表示アニメーション（スタッガード） */
-        .順次表示 {
-            opacity: 0;
-            animation: 下からフワッ 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        .section-header {
+            color: #ff758c;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
         }
-        @keyframes 下からフワッ {
-            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* 紙吹雪パーティクル */
-        .紙吹雪 {
-            position: fixed;
-            top: -10px;
-            width: 12px;
-            height: 12px;
-            border-radius: 4px;
-            z-index: 10000;
-            pointer-events: none;
-            animation: 降る linear forwards;
-        }
-        @keyframes 降る {
-            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1;}
-            100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0;}
-        }
-
-        #読み込み中 {
+        #loader {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(255, 249, 240, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 9999;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
-        .動くアイコン {
-            font-size: 5rem;
-            animation: ぽよんぽよん 0.8s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5);
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+        /* OCRアニメーション */
+        .scanning {
+            position: relative;
+            overflow: hidden;
         }
-        @keyframes ぽよんぽよん {
-            0% { transform: scale(1.1) translateY(-20px); }
-            100% { transform: scale(0.9) translateY(0) scaleY(0.8); }
+        .scanning::after {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(167, 139, 250, 0.4), transparent);
+            animation: scan 2s infinite linear;
         }
-
-        details summary { list-style: none; outline: none; }
-        details[open] summary .矢印 { transform: rotate(180deg); }
-        .矢印 { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
-
-        .集計ボックス {
-            padding: 16px 10px;
-            border-radius: 24px;
-            flex: 1;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            backdrop-filter: blur(15px);
-            box-shadow: inset 0 2px 10px rgba(255,255,255,0.3);
-            transition: transform 0.3s;
+        @keyframes scan {
+            0% { top: -100%; }
+            100% { top: 100%; }
         }
-        .集計ボックス:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* ラベルのアニメーション */
-        .ラベル移動 {
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .relative:focus-within .ラベル移動 {
-            transform: translateY(-4px) scale(1.05);
-            color: var(--メイン色);
-            text-shadow: 0 0 10px rgba(255,255,255,0.8);
-        }
-
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-20">
 
-    <!-- 超絶おしゃれなオーロラ背景を描画するキャンバス -->
-    <canvas id="背景キャンバス"></canvas>
-
-    <div id="読み込み中">
-        <div class="動くアイコン" id="icon-loading">🍡</div>
-        <p class="font-bold text-gray-500 mt-4 tracking-widest text-sm bg-white/50 px-4 py-2 rounded-full border border-white">魔法をかけてるよ...</p>
+    <div id="loader">
+        <div id="loader-icon" class="text-5xl animate-bounce mb-4">🌸</div>
+        <p id="loader-text" class="text-pink-400 font-bold">通信中...</p>
+        <div id="ocr-progress" class="hidden w-48 h-2 bg-gray-100 rounded-full mt-4 overflow-hidden">
+            <div class="h-full bg-purple-500 animate-[shimmer_2s_infinite]"></div>
+        </div>
     </div>
 
-    <header class="pt-16 pb-8 text-center relative z-10 順次表示" style="animation-delay: 0.1s;">
-        <h1 class="text-3xl font-bold tracking-tighter text-gray-700 drop-shadow-md">ふたりの暮らし家計簿</h1>
-        <p class="text-xs text-gray-500 mt-4 tracking-[0.3em] font-bold bg-white/60 inline-block px-5 py-2 rounded-full border border-white/80 shadow-sm backdrop-blur-sm">しりん ♥ あいき</p>
+    <header class="p-8 text-center">
+        <div class="inline-block px-4 py-1 border-2 border-pink-200 rounded-full text-[10px] text-pink-300 mb-2 font-bold tracking-widest uppercase">Love & AI Traceability</div>
+        <h1 class="text-2xl font-bold text-pink-400">ふたりの暮らし家計簿</h1>
     </header>
 
-    <main class="px-6 max-w-lg mx-auto space-y-8 relative z-10">
+    <main class="px-5 max-w-md mx-auto space-y-6">
         
-        <!-- メニュー画面 -->
-        <div id="画面-メニュー" class="grid grid-cols-1 gap-6">
-            <button onclick="ページ切替('入力')" class="ガラスのカード p-10 flex items-center gap-6 順次表示" style="animation-delay: 0.2s;">
-                <span class="text-6xl drop-shadow-md" id="icon-menu-input">✏️</span>
-                <div class="text-left">
-                    <p class="font-bold text-xl text-gray-700">ノートをかく</p>
-                    <p class="text-xs text-gray-500 mt-2 font-medium bg-white/50 inline-block px-3 py-1 rounded-md">あたらしい 記録をつけるよ</p>
-                </div>
+        <!-- Menu -->
+        <div id="nav-menu" class="grid grid-cols-2 gap-4">
+            <button onclick="showPage('input')" class="kawaii-card p-6 flex flex-col items-center">
+                <span class="text-4xl mb-2">✏️</span>
+                <span class="text-sm font-bold">ノートをつける</span>
             </button>
-            <button onclick="履歴をよむ()" class="ガラスのカード p-10 flex items-center gap-6 順次表示" style="animation-delay: 0.3s;">
-                <span class="text-6xl drop-shadow-md" id="icon-menu-history">📋</span>
-                <div class="text-left">
-                    <p class="font-bold text-xl text-gray-700">履歴をみる</p>
-                    <p class="text-xs text-gray-500 mt-2 font-medium bg-white/50 inline-block px-3 py-1 rounded-md">これまでの 歩みをふりかえるよ</p>
-                </div>
+            <button onclick="loadHistory()" class="kawaii-card p-6 flex flex-col items-center">
+                <span class="text-4xl mb-2">📒</span>
+                <span class="text-sm font-bold">過去のノート</span>
             </button>
         </div>
 
-        <!-- 入力画面 -->
-        <div id="画面-入力" class="hidden space-y-6">
-            <div class="flex justify-between items-center px-2 順次表示" style="animation-delay: 0.1s;">
-                <button onclick="ページ切替('メニュー')" class="text-gray-500 font-bold text-sm bg-white/70 px-6 py-3 rounded-full border border-white shadow-sm backdrop-blur-md active:scale-95 transition-all">
-                    ← もどる
+        <!-- Input Page -->
+        <div id="page-input" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="showPage('menu')" class="text-pink-300 font-bold text-sm">← 戻る</button>
+                <!-- AI OCR Button -->
+                <button onclick="document.getElementById('ocr-input').click()" class="btn-ai text-xs flex items-center gap-2">
+                    <span>✨ AIでノートを読み取る</span>
                 </button>
-                <button onclick="見本をいれる()" class="text-[10px] px-5 py-3 rounded-full text-blue-500 bg-white/90 font-bold border border-white shadow-md active:scale-95 transition-all flex items-center gap-1">
-                    <span id="icon-example" class="animate-pulse">✨</span> ノートの例をセット
-                </button>
+                <input type="file" id="ocr-input" accept="image/*" capture="environment" class="hidden" onchange="handleOCR(this)">
             </div>
-            
-            <form id="家計簿フォーム" class="ガラスのカード p-8 space-y-10 順次表示" style="animation-delay: 0.2s;">
-                <!-- 年月 -->
+
+            <form id="main-form" class="kawaii-card p-6 space-y-8">
+                <!-- 基本 -->
                 <div class="flex gap-4">
-                    <div class="flex-1 relative">
-                        <label class="text-[11px] text-gray-500 font-bold ml-3 mb-2 block tracking-widest ラベル移動">とし</label>
-                        <input type="number" name="year" id="入力-年" class="入力らん bg-white/50 border-none font-bold text-center text-xl text-gray-600 shadow-inner" readonly>
+                    <div class="flex-1">
+                        <label class="text-[10px] text-gray-400 ml-1">Year</label>
+                        <input type="number" name="year" id="in-year" class="input-box bg-gray-50" readonly>
                     </div>
-                    <div class="flex-1 relative">
-                        <label class="text-[11px] text-gray-500 font-bold ml-3 mb-2 block tracking-widest ラベル移動">つき</label>
-                        <select name="month" id="入力-月" class="入力らん font-bold text-center text-xl text-gray-600 appearance-none bg-white/80 shadow-inner"></select>
+                    <div class="flex-1">
+                        <label class="text-[10px] text-gray-400 ml-1">Month</label>
+                        <select name="month" id="in-month" class="input-box"></select>
                     </div>
                 </div>
 
                 <!-- 収入 -->
-                <section class="順次表示" style="animation-delay: 0.3s;">
-                    <div class="見出し"><div class="アイコン枠" id="icon-income">💰</div> はいってきた おかね</div>
-                    <div class="grid grid-cols-1 gap-5 bg-white/30 p-5 rounded-[28px] border border-white/50 shadow-inner">
-                        <div class="relative">
-                            <span class="ラベル移動 text-[10px] text-gray-500 absolute top-4 left-4 pointer-events-none font-bold z-10">前月ののこり</span>
-                            <input type="number" name="prevCarry" class="入力らん 計算対象 pt-8 font-bold text-gray-700" value="0" inputmode="numeric">
-                        </div>
-                        <div class="relative">
-                            <span class="ラベル移動 text-[10px] text-gray-500 absolute top-4 left-4 pointer-events-none font-bold z-10">しりんの給料</span>
-                            <input type="number" name="incomeS" class="入力らん 計算対象 pt-8 font-bold text-gray-700" value="0" inputmode="numeric">
-                        </div>
-                        <div class="relative">
-                            <span class="ラベル移動 text-[10px] text-gray-500 absolute top-4 left-4 pointer-events-none font-bold z-10">あいきの給料</span>
-                            <input type="number" name="incomeA" class="入力らん 計算対象 pt-8 font-bold text-gray-700" value="0" inputmode="numeric">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="relative">
-                                <span class="ラベル移動 text-[10px] text-gray-500 absolute top-4 left-4 pointer-events-none font-bold z-10">売電</span>
-                                <input type="number" name="incomeSolar" class="入力らん 計算対象 pt-8 text-sm font-bold text-gray-700" value="0" inputmode="numeric">
-                            </div>
-                            <div class="relative">
-                                <span class="ラベル移動 text-[10px] text-gray-500 absolute top-4 left-4 pointer-events-none font-bold z-10">その他</span>
-                                <input type="number" name="incomeOther" class="入力らん 計算対象 pt-8 text-sm font-bold text-gray-700" value="0" inputmode="numeric">
-                            </div>
-                        </div>
+                <div>
+                    <div class="section-header">収入</div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center"><span class="text-xs">前月くりこし</span><input type="number" name="prevCarry" class="input-box w-2/3 calc" value="0" inputmode="numeric"></div>
+                        <div class="flex justify-between items-center"><span class="text-xs">給料(芯)</span><input type="number" name="incomeS" class="input-box w-2/3 calc" value="0" inputmode="numeric"></div>
+                        <div class="flex justify-between items-center"><span class="text-xs">給料(愛)</span><input type="number" name="incomeA" class="input-box w-2/3 calc" value="0" inputmode="numeric"></div>
+                        <div class="flex justify-between items-center"><span class="text-xs">売電/他</span><input type="number" name="incomeSolar" class="input-box w-2/3 calc" value="0" inputmode="numeric"></div>
                     </div>
-                </section>
+                </div>
 
                 <!-- 固定支出 -->
-                <section class="順次表示" style="animation-delay: 0.4s;">
-                    <div class="見出し"><div class="アイコン枠" id="icon-fixed">📉</div> 決まっている支出</div>
-                    <div class="grid grid-cols-2 gap-4 bg-white/30 p-5 rounded-[28px] border border-white/50 shadow-inner">
-                        <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">保険(1)</span><input type="number" name="fixIns1" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                        <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">保険(2)</span><input type="number" name="fixIns2" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                        <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">ちゅぴcom</span><input type="number" name="fixComm" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                        <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">投資</span><input type="number" name="fixInvest" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                        <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">医療</span><input type="number" name="fixMed" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                        <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">光熱費よさん</span><input type="number" name="fixUtil" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                        
-                        <div class="col-span-2 mt-2 p-5 bg-white/50 border-2 border-dashed border-white rounded-[20px] grid grid-cols-2 gap-4">
-                            <span class="col-span-2 text-[10px] text-gray-500 font-bold text-center tracking-widest uppercase bg-white/60 py-1 rounded-full w-max mx-auto px-4">光熱費の実績メモ</span>
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[10px] text-gray-500 ml-2 font-bold block mb-1">水道</span><input type="number" name="utilWater" class="入力らん font-bold text-gray-600 bg-white/70" value="0" inputmode="numeric"></label>
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[10px] text-gray-500 ml-2 font-bold block mb-1">電気</span><input type="number" name="utilElec" class="入力らん font-bold text-gray-600 bg-white/70" value="0" inputmode="numeric"></label>
-                        </div>
+                <div>
+                    <div class="section-header">固定支出</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label><span class="text-[10px] ml-1">保険1</span><input type="number" name="fixIns1" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">保険2</span><input type="number" name="fixIns2" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">万ピコム</span><input type="number" name="fixComm" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">投資</span><input type="number" name="fixInvest" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">医療</span><input type="number" name="fixMed" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">光熱予算</span><input type="number" name="fixUtil" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1 text-blue-400">水(実)</span><input type="number" name="utilWater" class="input-box" value="0"></label>
+                        <label><span class="text-[10px] ml-1 text-blue-400">電(実)</span><input type="number" name="utilElec" class="input-box" value="0"></label>
                     </div>
-                </section>
+                </div>
 
                 <!-- 生活費 -->
-                <section class="順次表示" style="animation-delay: 0.5s;">
-                    <div class="見出し"><div class="アイコン枠" id="icon-daily">📅</div> しゅうごとの よさん</div>
-                    <div class="space-y-6 bg-white/30 p-5 rounded-[28px] border border-white/50 shadow-inner">
-                        <div class="p-6 bg-white/70 border border-white rounded-[24px] shadow-sm">
-                            <span class="text-xs font-bold text-blue-500 block mb-4 text-center tracking-widest bg-blue-50/50 py-1.5 rounded-full w-max mx-auto px-5 border border-blue-100">やりくり費 (1〜4週目・予備)</span>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">1週目</span><input type="number" name="day1W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">2週目</span><input type="number" name="day2W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">3週目</span><input type="number" name="day3W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">4週目</span><input type="number" name="day4W" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                                <label class="col-span-2 relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">予備のお金</span><input type="number" name="dayReserve" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">交通費</span><input type="number" name="dayTrans" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">特別なひ</span><input type="number" name="daySpecial" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">スマホ代</span><input type="number" name="dayComm" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-blue-500 font-bold ml-3 block mb-1">今月の貯金</span><input type="number" name="savings" class="入力らん 計算対象 border-blue-200 font-bold text-blue-600 bg-blue-50/70" value="0" inputmode="numeric"></label>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 border-t border-white/60 pt-6 mt-4">
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">おこづかい(しりん)</span><input type="number" name="dayPocketS" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
-                            <label class="relative focus-within:z-10"><span class="ラベル移動 text-[11px] text-gray-500 font-bold ml-3 block mb-1">おこづかい(あいき)</span><input type="number" name="dayPocketA" class="入力らん 計算対象 font-bold text-gray-700" value="0" inputmode="numeric"></label>
+                <div>
+                    <div class="section-header">生活費</div>
+                    <div class="bg-pink-50/30 p-4 rounded-2xl border-2 border-dashed border-pink-100 mb-4">
+                        <div class="grid grid-cols-3 gap-2">
+                            <label><span class="text-[9px]">1W</span><input type="number" name="day1W" class="input-box text-center p-1 calc" value="0"></label>
+                            <label><span class="text-[9px]">2W</span><input type="number" name="day2W" class="input-box text-center p-1 calc" value="0"></label>
+                            <label><span class="text-[9px]">3W</span><input type="number" name="day3W" class="input-box text-center p-1 calc" value="0"></label>
+                            <label><span class="text-[9px]">4W</span><input type="number" name="day4W" class="input-box text-center p-1 calc" value="0"></label>
+                            <label class="col-span-2"><span class="text-[9px]">予備</span><input type="number" name="dayReserve" class="input-box text-center p-1 calc" value="0"></label>
                         </div>
                     </div>
-                </section>
-
-                <!-- 集計サマリー -->
-                <div class="flex gap-3 pt-8 順次表示" style="animation-delay: 0.6s;">
-                    <div class="集計ボックス bg-gray-800/90 text-white shadow-xl border border-gray-700">
-                        <span class="text-[9px] font-bold opacity-80 uppercase bg-white/20 px-2 py-0.5 rounded-full inline-block mx-auto mb-1">はいった</span>
-                        <span class="text-[14px] font-bold tracking-tight" id="表示-収入">0円</span>
-                    </div>
-                    <div class="集計ボックス bg-white/80 text-gray-600 border border-white shadow-lg">
-                        <span class="text-[9px] font-bold opacity-80 uppercase bg-gray-100 px-2 py-0.5 rounded-full inline-block mx-auto mb-1">つかった</span>
-                        <span class="text-[14px] font-bold tracking-tight" id="表示-支出">0円</span>
-                    </div>
-                    <div class="集計ボックス bg-blue-400/95 text-white shadow-xl border border-blue-300">
-                        <span class="text-[9px] font-bold opacity-100 uppercase bg-white/30 px-2 py-0.5 rounded-full inline-block mx-auto mb-1">のこった</span>
-                        <span class="text-[14px] font-bold tracking-tight" id="表示-繰越">0円</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label><span class="text-[10px] ml-1">交通</span><input type="number" name="dayTrans" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">特別</span><input type="number" name="daySpecial" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">携帯/通信</span><input type="number" name="dayComm" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">貯金</span><input type="number" name="savings" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">おこづかいS</span><input type="number" name="dayPocketS" class="input-box calc" value="0"></label>
+                        <label><span class="text-[10px] ml-1">おこづかいA</span><input type="number" name="dayPocketA" class="input-box calc" value="0"></label>
                     </div>
                 </div>
 
-                <div class="順次表示" style="animation-delay: 0.7s;">
-                    <button type="button" onclick="保存する()" class="メインボタン w-full text-[19px] mt-6 flex items-center justify-center gap-3">
-                        <span id="icon-submit" class="text-2xl drop-shadow-sm">✨</span> この内容で 保存する
-                    </button>
+                <!-- 集計 -->
+                <div class="grid grid-cols-3 gap-2 pt-4 border-t-2 border-pink-100 text-center font-bold">
+                    <div class="bg-gray-100 p-2 rounded-xl"><p class="text-[8px] text-gray-400 uppercase">Income</p><p id="res-income" class="text-xs">0</p></div>
+                    <div class="bg-pink-50 p-2 rounded-xl text-pink-400"><p class="text-[8px] uppercase">Expense</p><p id="res-expense" class="text-xs">0</p></div>
+                    <div class="bg-pink-500 p-2 rounded-xl text-white shadow-lg shadow-pink-100"><p class="text-[8px] uppercase">Carry</p><p id="res-carry" class="text-xs">0</p></div>
                 </div>
+
+                <button type="button" onclick="sendData()" class="btn-main w-full">スプレッドシートに保存</button>
             </form>
         </div>
 
-        <!-- 履歴画面 -->
-        <div id="画面-履歴" class="hidden space-y-6">
-            <div class="flex justify-between items-center px-2">
-                <button onclick="ページ切替('メニュー')" class="text-gray-500 font-bold text-sm bg-white/70 px-6 py-3 rounded-full border border-white shadow-sm backdrop-blur-md active:scale-95 transition-all">
-                    ← もどる
-                </button>
-                <p class="text-[10px] text-gray-500 font-bold tracking-tighter bg-white/60 px-4 py-2 rounded-full border border-white shadow-sm">※最新のデータだけを表示中</p>
-            </div>
-            <div id="履歴リスト" class="space-y-8 pb-10">
-                <!-- 履歴カードがここに入る -->
-            </div>
+        <!-- History -->
+        <div id="page-history" class="hidden space-y-4">
+            <button onclick="showPage('menu')" class="mb-4 text-pink-300 font-bold text-sm">← 戻る</button>
+            <div id="history-list" class="space-y-4"></div>
         </div>
     </main>
 
-    <!-- モーダル -->
-    <div id="モーダル" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xl flex items-center justify-center z-[9999] p-8">
-        <div class="ガラスのカード bg-white/95 p-12 w-full max-w-sm text-center shadow-2xl border-2 border-white transform transition-transform duration-300 scale-95" id="モーダル中身">
-            <div id="モーダル-アイコン" class="text-7xl mb-6 drop-shadow-lg" style="animation: ぽよんぽよん 1s infinite alternate;"></div>
-            <div id="モーダル-テキスト" class="mb-10 font-bold text-gray-700 leading-relaxed text-lg tracking-tight"></div>
-            <button onclick="モーダル閉じる()" class="メインボタン w-full py-5 rounded-3xl text-xl tracking-widest shadow-xl">OK！</button>
-        </div>
-    </div>
-
     <script>
-        const GASのURL = "https://script.google.com/macros/s/AKfycbyTCsrfKanQ6A6L2DAdeP4GHU6nXyKqF8-eM0tBwgegmYWkD6gxMfFXDacI0-ncVu_s/exec";
-
-        // ★ 毎回かわる「気まぐれアイコン」辞書 ★
-        const 気まぐれアイコン = {
-            loading: ['🍡', '🍮', '🥞', '🍵', '🍰', '🌸', '✨', '🍀', '🍎', '🍓'],
-            menuInput: ['✏️', '📝', '🖍️', '🎨', '💌', '✒️'],
-            menuHistory: ['📋', '📖', '📚', '🗂️', '🔍', '🧭'],
-            income: ['💰', '✨', '💎', '🌈', '🍀', '👑', '👛'],
-            fixed: ['📉', '💳', '🏡', '🧾', '✂️', '🔌', '💸'],
-            daily: ['📅', '🗓️', '🎯', '⏳', '🧩', '🛍️', '🛒'],
-            example: ['✨', '💡', '🪄', '🎁', '🎈', '🎉'],
-            submit: ['✨', '🚀', '💌', '📮', '🌈', '🕊️'],
-            modalOk: ['⭐', '🌟', '🎉', '🎊', '🌸', '💖', '🥳'],
-            modalErr: ['💦', '💧', '🌧️', '⛈️', '☔', '🥺', '🥲']
-        };
-
-        function アイコンをガチャる() {
-            const getIcon = (key) => 気まぐれアイコン[key][Math.floor(Math.random() * 気まぐれアイコン[key].length)];
-            document.getElementById('icon-loading').innerText = getIcon('loading');
-            document.getElementById('icon-menu-input').innerText = getIcon('menuInput');
-            document.getElementById('icon-menu-history').innerText = getIcon('menuHistory');
-            document.getElementById('icon-income').innerText = getIcon('income');
-            document.getElementById('icon-fixed').innerText = getIcon('fixed');
-            document.getElementById('icon-daily').innerText = getIcon('daily');
-            document.getElementById('icon-example').innerText = getIcon('example');
-            document.getElementById('icon-submit').innerText = getIcon('submit');
-        }
-
-        // ★ 世界一おしゃれな「オーロラ背景」生成（Canvas） ★
-        function オーロラ背景を描く() {
-            const canvas = document.getElementById('背景キャンバス');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-
-            function resize() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            // パステルカラーのオーブ
-            const orbs = [
-                { x: 0.2, y: 0.2, r: 0.5, color: '#ffb7c5', vx: 0.0008, vy: 0.001 }, // ピンク
-                { x: 0.8, y: 0.8, r: 0.6, color: '#87ceeb', vx: -0.001, vy: -0.0008 }, // 水色
-                { x: 0.5, y: 0.5, r: 0.7, color: '#f9e2af', vx: 0.0006, vy: -0.001 }, // 黄色
-                { x: 0.8, y: 0.2, r: 0.55, color: '#ffdac1', vx: -0.0012, vy: 0.0006 } // サーモン
-            ];
-
-            function draw() {
-                ctx.clearRect(0, 0, width, height);
-                ctx.globalCompositeOperation = 'lighter'; // 重なると綺麗に発色
-
-                orbs.forEach(orb => {
-                    orb.x += orb.vx;
-                    orb.y += orb.vy;
-                    if (orb.x < -0.2 || orb.x > 1.2) orb.vx *= -1;
-                    if (orb.y < -0.2 || orb.y > 1.2) orb.vy *= -1;
-
-                    const radius = orb.r * Math.min(width, height);
-                    const cx = orb.x * width;
-                    const cy = orb.y * height;
-
-                    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-                    grad.addColorStop(0, orb.color);
-                    grad.addColorStop(1, 'transparent');
-
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-                requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
-        // ★ 紙吹雪パーティクル生成 ★
-        function 紙吹雪を舞らす() {
-            const colors = ['#87ceeb', '#ffb7c5', '#f9e2af', '#ffffff', '#add8e6'];
-            for (let i = 0; i < 60; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = '紙吹雪';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                // 丸や四角を混ぜる
-                if(Math.random() > 0.5) confetti.style.borderRadius = '0';
-                
-                const duration = (Math.random() * 2 + 1.5) + 's';
-                confetti.style.animationDuration = duration;
-                confetti.style.animationDelay = (Math.random() * 0.5) + 's';
-                
-                document.body.appendChild(confetti);
-                setTimeout(() => confetti.remove(), parseFloat(duration) * 1000 + 1000);
-            }
-        }
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxZOmmvIXGoQQukVVxs5Ll3vdmt2H3Rs5SWNIbdNwZOH0naVHH6S0XWTtKQGAQ8of7A4Q/exec";
+        const apiKey = ""; // 実行環境から提供されます
 
         window.onload = () => {
-            アイコンをガチャる();
-            オーロラ背景を描く();
-
-            document.getElementById('入力-年').value = 2026;
-            const 月選択 = document.getElementById('入力-月');
-            const 今の月 = new Date().getMonth() + 1;
+            const now = new Date();
+            document.getElementById('in-year').value = now.getFullYear();
+            const monthSelect = document.getElementById('in-month');
             for(let i=1; i<=12; i++) {
-                const 選 = document.createElement('option');
-                選.value = i; 選.textContent = i + "月";
-                if(i === 今の月) 選.selected = true;
-                月選択.appendChild(選);
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = i + "月";
+                if(i === now.getMonth() + 1) opt.selected = true;
+                monthSelect.appendChild(opt);
             }
-            計算の準備();
+            document.querySelectorAll('.calc').forEach(el => el.addEventListener('input', calculate));
         };
 
-        function ページ切替(名) {
-            アイコンをガチャる(); // 気分転換
+        function showPage(p) {
+            document.getElementById('nav-menu').classList.toggle('hidden', p !== 'menu');
+            document.getElementById('page-input').classList.toggle('hidden', p !== 'input');
+            document.getElementById('page-history').classList.toggle('hidden', p !== 'history');
+        }
+
+        // --- AI OCR Logic (Gemini 2.5 Flash) ---
+        async function handleOCR(input) {
+            if (!input.files || !input.files[0]) return;
             
-            document.getElementById('画面-メニュー').classList.add('hidden');
-            document.getElementById('画面-入力').classList.add('hidden');
-            document.getElementById('画面-履歴').classList.add('hidden');
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            setLoader(true, "AIがノートを解析中...", "✨", true);
 
-            const target = document.getElementById('画面-' + 名);
-            target.classList.remove('hidden');
+            reader.onload = async (e) => {
+                const base64 = e.target.result.split(',')[1];
+                const prompt = `
+                画像は日本の夫婦の家計簿予算ノートです。以下の項目を抽出し、JSON形式で返してください。
+                数値が見当たらない場合は0としてください。
+                
+                {
+                    "year": 数値(例:2026), "month": 数値(例:1),
+                    "prevCarry": 前月くりこし金額,
+                    "incomeS": S(芯)の給料, "incomeA": A(愛)の給料,
+                    "incomeSolar": 売電収入, "incomeOther": その他収入,
+                    "fixIns1": 保険1, "fixIns2": 保険2,
+                    "fixComm": 万ピコム/通信費, "fixInvest": 投資,
+                    "fixMed": 医療, "fixUtil": 光熱費予算,
+                    "utilWater": 水道実績, "utilElec": 電気実績,
+                    "day1W": 1週目予算, "day2W": 2週目予算, "day3W": 3週目予算, "day4W": 4週目予算,
+                    "dayReserve": 予備費, "dayTrans": 交通費,
+                    "daySpecial": 特別費, "dayComm": 携帯通信,
+                    "dayPocketS": おこづかいS, "dayPocketA": おこづかいA,
+                    "savings": 貯金
+                }`;
 
-            // 入力画面の順次表示アニメーションをリセットして再発火
-            if (名 === '入力') {
-                const els = target.querySelectorAll('.順次表示');
-                els.forEach(el => {
-                    el.style.animation = 'none';
-                    el.offsetHeight; /* trigger reflow */
-                    el.style.animation = null; 
+                try {
+                    const result = await callGemini(prompt, base64);
+                    const data = JSON.parse(result);
+                    applyOCRData(data);
+                    setLoader(false);
+                } catch (err) {
+                    console.error(err);
+                    alert("AI解析に失敗しました。手動で入力してください。");
+                    setLoader(false);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function callGemini(prompt, base64) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: prompt },
+                        { inlineData: { mimeType: "image/png", data: base64 } }
+                    ]
+                }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+
+            let retryCount = 0;
+            const maxRetries = 5;
+            
+            while (retryCount <= maxRetries) {
+                try {
+                    const resp = await fetch(url, { method: 'POST', body: JSON.stringify(payload) });
+                    const json = await resp.json();
+                    return json.candidates[0].content.parts[0].text;
+                } catch (e) {
+                    if (retryCount === maxRetries) throw e;
+                    const delay = Math.pow(2, retryCount) * 1000;
+                    await new Promise(r => setTimeout(r, delay));
+                    retryCount++;
+                }
+            }
+        }
+
+        function applyOCRData(data) {
+            if (!data) return;
+            const form = document.getElementById('main-form');
+            for (let key in data) {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    input.value = data[key];
+                    if (key === 'month') input.dispatchEvent(new Event('change'));
+                }
+            }
+            calculate();
+        }
+
+        function setLoader(show, text = "通信中...", icon = "🌸", isOcr = false) {
+            const l = document.getElementById('loader');
+            document.getElementById('loader-text').textContent = text;
+            document.getElementById('loader-icon').textContent = icon;
+            document.getElementById('ocr-progress').classList.toggle('hidden', !isOcr);
+            l.style.display = show ? 'flex' : 'none';
+        }
+
+        // --- Standard Logic ---
+        function calculate() {
+            const fd = new FormData(document.getElementById('main-form'));
+            const v = (n) => parseFloat(fd.get(n)) || 0;
+            const income = v('prevCarry') + v('incomeS') + v('incomeA') + v('incomeSolar');
+            const living = v('day1W') + v('day2W') + v('day3W') + v('day4W') + v('dayReserve');
+            const fixed = v('fixIns1') + v('fixIns2') + v('fixComm') + v('fixInvest') + v('fixMed') + v('fixUtil');
+            const others = v('dayTrans') + v('daySpecial') + v('dayComm') + v('dayPocketS') + v('dayPocketA') + v('savings');
+            const expense = living + fixed + others;
+            document.getElementById('res-income').textContent = income.toLocaleString();
+            document.getElementById('res-expense').textContent = expense.toLocaleString();
+            document.getElementById('res-carry').textContent = (income - expense).toLocaleString();
+            return { income, expense, carry: income - expense };
+        }
+
+        async function sendData() {
+            const res = calculate();
+            const fd = new FormData(document.getElementById('main-form'));
+            const data = { timestamp: new Date().toLocaleString("ja-JP"), resIncome: res.income, resExpense: res.expense, resCarry: res.carry };
+            for(let [k,v] of fd.entries()) data[k] = isNaN(v) ? v : parseFloat(v);
+            
+            setLoader(true, "保存中...");
+            try {
+                const resp = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) });
+                const result = await resp.json();
+                if(result.status === 'success') {
+                    alert("スプレッドシートへ保存しました！");
+                    showPage('menu');
+                }
+            } catch(e) { alert("保存に失敗しました。"); }
+            finally { setLoader(false); }
+        }
+
+        async function loadHistory() {
+            setLoader(true, "履歴を取得中...");
+            try {
+                const r = await fetch(GAS_URL);
+                const res = await r.json();
+                const list = document.getElementById('history-list');
+                list.innerHTML = "";
+                res.data.reverse().forEach(row => {
+                    const card = document.createElement('div');
+                    card.className = "kawaii-card p-5 space-y-3";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center border-b pb-2 border-pink-50">
+                            <span class="font-bold text-pink-400">${row.year}年 ${row.month}月</span>
+                            <span class="text-[8px] text-gray-300 tracking-tighter">${row.timestamp}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center text-[10px] text-gray-500">
+                            <div class="bg-gray-50 p-2 rounded-xl">収入<br>¥${(row.resIncome||0).toLocaleString()}</div>
+                            <div class="bg-pink-50 p-2 rounded-xl">支出<br>¥${(row.resExpense||0).toLocaleString()}</div>
+                            <div class="bg-pink-500 text-white p-2 rounded-xl font-bold">繰越<br>¥${(row.resCarry||0).toLocaleString()}</div>
+                        </div>`;
+                    list.appendChild(card);
                 });
-            }
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function 計算の準備() {
-            document.querySelectorAll('.計算対象').forEach(el => {
-                el.addEventListener('input', 合計計算);
-            });
-        }
-
-        function 見本をいれる() {
-            const フォーム = document.getElementById('家計簿フォーム');
-            const 値 = {
-                prevCarry: 10000, incomeS: 435000, incomeA: 98000, incomeSolar: 0, incomeOther: 0,
-                fixIns1: 15000, fixIns2: 6800, fixComm: 2200, fixInvest: 40000, fixMed: 5000, fixUtil: 15000,
-                utilWater: 3496, utilElec: 13638,
-                day1W: 40000, day2W: 15000, day3W: 6000, day4W: 15000, dayReserve: 14000,
-                dayTrans: 21000, daySpecial: 30000, dayComm: 18000, dayPocketS: 30000, dayPocketA: 30000, savings: 240000
-            };
-            for (const キー in 値) {
-                const el = フォーム.querySelector(`[name="${キー}"]`);
-                if (el) el.value = 値[キー];
-            }
-            合計計算();
-            モーダル表示(気まぐれアイコン.modalOk[Math.floor(Math.random() * 気まぐれアイコン.modalOk.length)], "あいきさんのノート例を\nセットしたよ！");
-        }
-
-        function 合計計算() {
-            const フォームデータ = new FormData(document.getElementById('家計簿フォーム'));
-            const 数値 = (名) => parseFloat(フォームデータ.get(名)) || 0;
-
-            const 収入 = 数値('prevCarry') + 数値('incomeS') + 数値('incomeA') + 数値('incomeSolar') + 数値('incomeOther');
-            const 生活費内 = 数値('day1W') + 数値('day2W') + 数値('day3W') + 数値('day4W') + 数値('dayReserve');
-            const 固定費 = 数値('fixIns1') + 数値('fixIns2') + 数値('fixComm') + 数値('fixInvest') + 数値('fixMed') + 数値('fixUtil');
-            
-            // ★ 修正点: 支出の合計に「貯金 (savings)」を含めない
-            const その他 = 数値('dayTrans') + 数値('daySpecial') + 数値('dayComm') + 数値('dayPocketS') + 数値('dayPocketA');
-            
-            const 支出 = 固定費 + 生活費内 + その他;
-            
-            // ★ 修正点: 収入から支出を引き、さらに「貯金」を引いた残りが純粋な「繰越」になる
-            const 繰越 = 収入 - 支出 - 数値('savings');
-
-            document.getElementById('表示-収入').textContent = 収入.toLocaleString() + "円";
-            document.getElementById('表示-支出').textContent = 支出.toLocaleString() + "円";
-            document.getElementById('表示-繰越').textContent = 繰越.toLocaleString() + "円";
-
-            return { 収入, 支出, 繰越 };
-        }
-
-        async function 保存する() {
-            const 結果 = 合計計算();
-            const フォームデータ = new FormData(document.getElementById('家計簿フォーム'));
-            const データ = {
-                timestamp: new Date().toLocaleString("ja-JP"),
-                resIncome: 結果.収入, resExpense: 結果.支出, resCarry: 結果.繰越
-            };
-            for(let [キー, 値] of フォームデータ.entries()) データ[キー] = isNaN(値) ? 値 : parseFloat(値);
-
-            読み込み表示(true);
-            try {
-                const 送信 = await fetch(GASのURL, { method: 'POST', body: JSON.stringify(データ) });
-                const 返答 = await 送信.json();
-                if(返答.status === 'success') {
-                    紙吹雪を舞らす(); // ★ 保存成功でお祝い！
-                    const icon = 気まぐれアイコン.modalOk[Math.floor(Math.random() * 気まぐれアイコン.modalOk.length)];
-                    モーダル表示(icon, "ノートを保存したよ！\n(履歴では最新のみ見えるよ)");
-                    document.getElementById('家計簿フォーム').reset();
-                    document.getElementById('入力-年').value = 2026;
-                    ページ切替('メニュー');
-                } else { throw new Error(返答.message); }
-            } catch(e) {
-                const errIcon = 気まぐれアイコン.modalErr[Math.floor(Math.random() * 気まぐれアイコン.modalErr.length)];
-                モーダル表示(errIcon, "しっぱい...\nもう一度やってみてね");
-            } finally {
-                読み込み表示(false);
-            }
-        }
-
-        async function 履歴をよむ() {
-            読み込み表示(true);
-            try {
-                const 取得 = await fetch(GASのURL);
-                const 返答 = await 取得.json();
-                if(返答.status === 'success') {
-                    履歴を表示(返答.data);
-                    ページ切替('履歴');
-                } else { throw new Error(返答.message); }
-            } catch(e) {
-                const errIcon = 気まぐれアイコン.modalErr[Math.floor(Math.random() * 気まぐれアイコン.modalErr.length)];
-                モーダル表示(errIcon, "データが とれなかったよ");
-            } finally {
-                読み込み表示(false);
-            }
-        }
-
-        function 履歴を表示(データ) {
-            const リスト = document.getElementById('履歴リスト');
-            リスト.innerHTML = "";
-            if (!データ || データ.length === 0) {
-                リスト.innerHTML = "<div class='ガラスのカード p-12 text-center text-gray-500 font-bold'>まだ 記録がないよ🌱</div>";
-                return;
-            }
-
-            // 同一月は「最新」のみ抽出
-            const 最新マップ = new Map();
-            データ.forEach(行 => {
-                const キー = `${行.year}-${行.month}`;
-                最新マップ.set(キー, 行);
-            });
-
-            const 表示データ = Array.from(最新マップ.values()).reverse();
-            
-            表示データ.forEach((行, index) => {
-                const カード = document.createElement('div');
-                // 履歴カードも順次表示
-                カード.className = "ガラスのカード overflow-hidden 順次表示 mb-6";
-                カード.style.animationDelay = (index * 0.1) + 's';
-                カード.innerHTML = `
-                    <div class="px-8 py-6 flex justify-between items-baseline border-b border-white/60 bg-white/40">
-                        <span class="font-bold text-gray-700 text-2xl drop-shadow-sm">${行.year}年 ${行.month}月</span>
-                        <span class="text-[9px] text-gray-500 font-bold tracking-tighter italic bg-white/70 px-3 py-1.5 rounded-full border border-white/50 shadow-sm">${行.timestamp}</span>
-                    </div>
-
-                    <div class="px-8 py-8 flex gap-3">
-                        <div class="集計ボックス bg-white/70 shadow-inner border border-white/50">
-                            <span class="text-[9px] text-gray-500 font-bold uppercase bg-white/50 px-2 py-0.5 rounded-full mb-1 inline-block">はいった</span>
-                            <span class="text-[13px] font-bold text-gray-700">¥${(行.resIncome||0).toLocaleString()}</span>
-                        </div>
-                        <div class="集計ボックス bg-white/70 shadow-inner border border-white/50">
-                            <span class="text-[9px] text-gray-500 font-bold uppercase bg-white/50 px-2 py-0.5 rounded-full mb-1 inline-block">つかった</span>
-                            <span class="text-[13px] font-bold text-gray-700">¥${(行.resExpense||0).toLocaleString()}</span>
-                        </div>
-                        <div class="集計ボックス bg-blue-400 text-white shadow-lg border border-blue-300">
-                            <span class="text-[9px] opacity-100 font-bold uppercase bg-white/30 px-2 py-0.5 rounded-full mb-1 inline-block">のこった</span>
-                            <span class="text-[14px] font-bold tracking-tight">¥${(行.resCarry||0).toLocaleString()}</span>
-                        </div>
-                    </div>
-
-                    <details class="group">
-                        <summary class="text-center text-[11px] text-gray-600 font-bold cursor-pointer py-5 border-t border-white/60 bg-white/50 hover:bg-white/80 transition-colors flex items-center justify-center gap-2 tracking-widest uppercase">
-                            詳細をひらく <span class="矢印 text-blue-500 text-base">▼</span>
-                        </summary>
-                        <div class="px-8 pb-10 pt-6 space-y-8 text-[12px] text-gray-700 bg-white/40 border-t border-white/50">
-                            <div class="space-y-3 bg-white/50 p-5 rounded-[24px] border border-white/60 shadow-inner">
-                                <p class="text-[11px] font-bold text-blue-500 border-b border-blue-200/50 pb-2 mb-3 flex items-center gap-2"><span class="text-lg">💰</span> 収入の内訳</p>
-                                <div class="flex justify-between"><span>前月より:</span><span class="font-bold text-gray-800">¥${(行.prevCarry||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span>しりん:</span><span class="font-bold text-gray-800">¥${(行.incomeS||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span>あいき:</span><span class="font-bold text-gray-800">¥${(行.incomeA||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span>売電/他:</span><span class="font-bold text-gray-800">¥${((行.incomeSolar||0)+(行.incomeOther||0)).toLocaleString()}</span></div>
-                            </div>
-                            <div class="space-y-3 bg-white/50 p-5 rounded-[24px] border border-white/60 shadow-inner">
-                                <p class="text-[11px] font-bold text-blue-500 border-b border-blue-200/50 pb-2 mb-3 flex items-center gap-2"><span class="text-lg">📉</span> 固定の支出</p>
-                                <div class="flex justify-between"><span>保険:</span><span class="font-bold text-gray-800">¥${((行.fixIns1||0)+(行.fixIns2||0)).toLocaleString()}</span></div>
-                                <div class="flex justify-between text-blue-600 font-bold"><span>ちゅぴcom:</span><span>¥${(行.fixComm||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span>投資:</span><span class="font-bold text-gray-800">¥${(行.fixInvest||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between text-[11px]"><span>光熱費予算:</span><span class="font-bold text-gray-800">¥${(行.fixUtil||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between text-[10px] text-gray-500 bg-white/60 p-3 rounded-xl mt-3 border border-white shadow-sm"><span>実績(水/電):</span><span class="font-bold text-gray-600">¥${(行.utilWater||0).toLocaleString()} / ¥${(行.utilElec||0).toLocaleString()}</span></div>
-                            </div>
-                            <div class="space-y-3 bg-white/50 p-5 rounded-[24px] border border-white/60 shadow-inner">
-                                <p class="text-[11px] font-bold text-blue-500 border-b border-blue-200/50 pb-2 mb-3 flex items-center gap-2"><span class="text-lg">📅</span> しゅうごとの予算</p>
-                                <div class="grid grid-cols-2 gap-x-6 gap-y-3">
-                                    <div class="flex justify-between"><span>1週目:</span><span class="font-bold text-gray-800">¥${(行.day1W||0).toLocaleString()}</span></div>
-                                    <div class="flex justify-between"><span>2週目:</span><span class="font-bold text-gray-800">¥${(行.day2W||0).toLocaleString()}</span></div>
-                                    <div class="flex justify-between"><span>3週目:</span><span class="font-bold text-gray-800">¥${(行.day3W||0).toLocaleString()}</span></div>
-                                    <div class="flex justify-between"><span>4週目:</span><span class="font-bold text-gray-800">¥${(行.day4W||0).toLocaleString()}</span></div>
-                                    <div class="flex justify-between col-span-2 pt-3 border-t border-white/60 mt-1"><span>予備のお金:</span><span class="font-bold text-gray-800">¥${(行.dayReserve||0).toLocaleString()}</span></div>
-                                </div>
-                            </div>
-                            <div class="space-y-3 bg-white/50 p-5 rounded-[24px] border border-white/60 shadow-inner">
-                                <p class="text-[11px] font-bold text-blue-500 border-b border-blue-200/50 pb-2 mb-3 flex items-center gap-2"><span class="text-lg">✨</span> その他・貯金</p>
-                                <div class="flex justify-between"><span>交通/特別/通信:</span><span class="font-bold text-gray-800">¥${((行.dayTrans||0)+(行.daySpecial||0)+(行.dayComm||0)).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span>お小遣い(しりん):</span><span class="font-bold text-gray-800">¥${(行.dayPocketS||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span>お小遣い(あいき):</span><span class="font-bold text-gray-800">¥${(行.dayPocketA||0).toLocaleString()}</span></div>
-                                <div class="flex justify-between font-bold text-blue-600 bg-blue-100/60 p-5 rounded-2xl mt-5 border border-blue-200 shadow-md items-center">
-                                    <span class="text-[12px] tracking-widest">今月の純貯金</span>
-                                    <span class="text-[18px]">¥${(行.savings||0).toLocaleString()}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </details>
-                `;
-                リスト.appendChild(カード);
-            });
-        }
-
-        function 読み込み表示(フラグ) {
-            document.getElementById('読み込み中').style.display = フラグ ? 'flex' : 'none';
-        }
-        function モーダル表示(アイコン, テキスト) {
-            const modal = document.getElementById('モーダル');
-            const inner = document.getElementById('モーダル中身');
-            document.getElementById('モーダル-アイコン').textContent = アイコン;
-            document.getElementById('モーダル-テキスト').innerText = テキスト;
-            
-            modal.classList.remove('hidden');
-            // ポップアップアニメーション
-            requestAnimationFrame(() => {
-                inner.classList.remove('scale-95');
-                inner.classList.add('scale-100');
-            });
-        }
-        function モーダル閉じる() {
-            const modal = document.getElementById('モーダル');
-            const inner = document.getElementById('モーダル中身');
-            inner.classList.remove('scale-100');
-            inner.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 200);
+                showPage('history');
+            } catch(e) { alert("取得失敗"); }
+            finally { setLoader(false); }
         }
     </script>
 </body>
