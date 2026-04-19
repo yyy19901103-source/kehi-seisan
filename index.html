@@ -217,6 +217,7 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxZOmmvIXGoQQukVVxs5Ll3vdmt2H3Rs5SWNIbdNwZOH0naVHH6S0XWTtKQGAQ8of7A4Q/exec";
+        const ACCESS_TOKEN = "nani-kakeibo-2026-k8mXp3wQvLfR";
         const apiKey = ""; // 実行環境から提供されます
 
         window.onload = () => {
@@ -357,6 +358,7 @@
             
             setLoader(true, "保存中...");
             try {
+                data.token = ACCESS_TOKEN;
                 const resp = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) });
                 const result = await resp.json();
                 if(result.status === 'success') {
@@ -370,7 +372,7 @@
         async function loadHistory() {
             setLoader(true, "履歴を取得中...");
             try {
-                const r = await fetch(GAS_URL);
+                const r = await fetch(GAS_URL + "?token=" + ACCESS_TOKEN);
                 const res = await r.json();
                 const list = document.getElementById('history-list');
                 list.innerHTML = "";
