@@ -19,6 +19,13 @@
 | タイトルテスト／ゴーストデッキ | 本文を作る前にタイトルだけを並べ、それだけで話が通じるか確かめる | 同上 |
 | 主張と根拠（Assertion-Evidence） | 2行以内の文章タイトル＋図・写真・グラフによる根拠。箇条書きを避ける。箇条書き型より理解・記憶が良いという研究結果がある | Michael Alley（ペンシルベニア州立大学）、ASEE（米国工学教育学会）論文 |
 | 1ページ1メッセージ | 1ページで言うことは1つ | 上記に共通 |
+| 横の論理・縦の論理 | 横：タイトルを順に読んで話が通るか。縦：各ページの図がタイトルを証明しているか | コンサルティング会社のレビュー作法 |
+| 根拠は3点以内 | 1ページの根拠は最大3点。各ページの間に「つなぎ」を置き、最後に依頼事項を置く | 既存スキル presentation-writing-claude-skill |
+| 図は1つ、言いたい点を書き込む | 結果のページは図を1つに絞り、注目点を図に直接書く。出典を付ける。最終ページは結論のまま質疑に入る | 既存スキル academic-pptx-skill |
+| 現状とあるべき姿の対比 | 現状（what is）とあるべき姿（what could be）の差を示し、提案をその差を埋める手段として出す | Nancy Duarte『Resonate』 |
+| 文章で論理を詰める | 箇条書きは論理の飛びを隠す。事前配布資料は文章で書き、論理のつながりを示す | Amazon の6ページメモ |
+| AIらしい言い回しを消す | 数字のない抽象語、毎回揃った3点の箇条書きを避ける。「人に向かって口に出して言うか」で確かめる | 既存スキル presentation-writing-claude-skill |
+| 工程を分けて人が確認する | 前提整理 → 構成案 → 本文 → 図表 → レビューの順に進め、各段階で人が直す | 国内の生成AI資料作成ガイド |
 
 ## 3. 場面別の土台
 
@@ -42,7 +49,18 @@
 | 統計の根拠 | 効果や合否はばらつき（σ、Cp/Cpk など）を含めて示す。平均値だけで判断しない |
 | 骨子の段階で上司と合わせる | PPT化の前に、骨子（一番言うべきこと＋タイトル一覧）を上司に見せて方向を確認する |
 
-## 5. 出典
+## 5. 既存のスキル・ツールから取り入れたこと
+
+| 既存のもの | 取り入れたこと | 取り入れなかったこと |
+|---|---|---|
+| presentation-writing-claude-skill（物語の型7種、1ページ1主張） | 根拠3点以内、つなぎ、最後に依頼、AIらしい言い回しの点検 | 投資家向けピッチなど、利用者の場面に無い型 |
+| academic-pptx-skill（学術発表） | 図は1つ、注目点の書き込み、出典、結論のまま質疑 | 学会固有の引用形式（予備R1を使うときに再検討） |
+| コンサル向けスキル（ピラミッド・アクションタイトル） | 横の論理・縦の論理の点検 | 戦略コンサルの市場分析フレーム（利用者の場面では使わない） |
+| 国内の Claude スライド作成スキル・生成AI資料作成ガイド | 工程を分けて人が確認する、役割・目的・対象者・枚数の指定 | 自社フォーマットへの自動流し込み（会社のテンプレートが必要） |
+| Claude for PowerPoint（2026年2月公開、Max・Team・Enterprise向け） | 骨子の後の工程として、会社テンプレートへの流し込みに使う | — |
+| Anthropic のスキル作成の作法 | 説明文に使う場面と使わない場面を書く、本体は短く詳細は参照ファイルへ、見本を付ける、試験ケースで確かめる | — |
+
+## 6. 出典
 
 - Barbara Minto, The Pyramid Principle — https://www.powerusersoftwares.com/post/give-a-brilliant-structure-to-your-presentations-with-the-pyramid-principle
 - Pyramid Principle / ghost deck — https://deckary.com/blog/pyramid-principle-consulting
@@ -56,3 +74,12 @@
 - 稟議書の記載項目 — https://biz.moneyforward.com/accounting/basic/78232/
 - 空・雨・傘、So What／Why So — https://president.jp/articles/-/16678
 - デジタルガバナンス・コード3.0 — https://www.kaiketsu-j.com/environment/12286
+- presentation-writing-claude-skill — https://github.com/marcusnelson/presentation-writing-claude-skill
+- academic-pptx-skill — https://github.com/Gabberflast/academic-pptx-skill
+- 横の論理・縦の論理 — https://deckary.com/blog/consulting-quality-slides
+- Nancy Duarte『Resonate』— https://www.duarte.com/blog/ultimate-guide-to-contrast/
+- Amazon の6ページメモ — https://managementconsulted.com/amazon-memo/
+- Claude でのスライド作成（国内）— https://ai-keiei.shift-ai.co.jp/claude-slide-creation/
+- Claude for PowerPoint — https://www.prezent.ai/blog/claude-for-powerpoint
+- スキル作成の作法 — https://www.beri.net/learning/claude-docs-skill-authoring-best-practices
+- Skills と Projects の違い — https://claude.com/blog/skills-explained

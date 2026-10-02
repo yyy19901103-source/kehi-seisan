@@ -9,7 +9,9 @@
 |---|---|
 | `skills/dx-presentation-skeleton/SKILL.md` | 手順、判定の質問、出力形式、書き方のルール、点検表 |
 | `skills/dx-presentation-skeleton/references/patterns.md` | 15パターンの標準構成（説明する内容、言うべきことの例、想定質問） |
-| `skills/dx-presentation-skeleton/references/principles.md` | 骨子作成の原則と出典 |
+| `skills/dx-presentation-skeleton/references/principles.md` | 骨子作成の原則、既存スキルから取り入れたこと、出典 |
+| `skills/dx-presentation-skeleton/references/example.md` | 出力の見本（A1 稟議） |
+| `docs/dx-presentation-skeleton-tests.md` | スキル変更時の試験ケース |
 
 ## 1. 分類
 
@@ -28,13 +30,13 @@
 
 | 手順 | すること |
 |---|---|
-| ① 依頼を受ける | 状況（何の件か、聞き手、してほしいこと、時期、手元の数字、時間の制約）を Claude に書く |
+| ① 依頼を受ける | 状況（何の件か、聞き手、してほしいこと、時期、手元の数字、時間の制約、資料の使われ方）を Claude に書く |
 | ② 判定 | Claude がパターンを判定する。割れる場合は利用者が選ぶ |
-| ③ 骨子 | Claude が「一番言うべきこと、目次、ページ構成、タイトルテスト、想定質問、足りない情報」を出す |
+| ③ 骨子 | Claude が「一番言うべきこと、目次、ページ構成、話の流れ、想定質問、足りない情報」を出す |
 | ④ 修正 | 利用者が内容を直す。足りない情報を集める |
 | ⑤ 上司確認 | 骨子（一番言うべきこと＋タイトル一覧）の段階で上司と方向を合わせる |
-| ⑥ PPT化 | 会社のPPT書式に流し込み、図・データを入れる |
-| ⑦ 振り返り | 受けた質問・指摘を記録し、スキルを直す |
+| ⑥ PPT化 | 会社のPPT書式に流し込み、図・データを入れる。Claude for PowerPoint（Max・Team・Enterprise向け）が会社で使えれば、骨子を貼って会社テンプレートで下書きを作れる |
+| ⑦ 振り返り | 受けた質問・指摘を記録し、スキルを直す。直したら試験ケースで確かめる |
 
 ## 3. Claude への登録方法
 
